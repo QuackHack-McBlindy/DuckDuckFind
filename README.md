@@ -6,27 +6,27 @@ Welcome to **DuckDuckFind**, an API primarily designed to streamline search oper
 
 ## **Table of Contents**
 
-    - [Features](#features)
-    - [Getting Started](#getting-started)
-    - [API Endpoints](#api-endpoints)
-    - [Contributing](#contributing)
-    - [Questions?](#questions)
+- [Features](#features)
+- [Getting Started](#getting-started)
+- [API Endpoints](#api-endpoints)
+- [Contributing](#contributing)
+- [Questions?](#questions)
 
 
 ## **Features**
 
-    - Search Documents: Index and search your own documents.
-    - Stock Price Retrieval: Get the latest stock prices.
-    - Opening Hours: Retrieve business opening hours.
-    - AI Chat: Engage in conversations with AI.
-    - Text Search: Search the web for text-based content.
-    - Image Search: Find images on the web.
-    - Video Search: Locate videos online.
-    - News Search: Get the latest news articles.
-    - Map Search: Search for location-based results.
-    - Translation: Translate text to different languages.
-    - Search Suggestions: Get suggestions based on your query.
-    - Direct Answers: Retrieve direct answers to your questions.
+- Search Documents: Index and search your own documents.
+- Stock Price Retrieval: Get the latest stock prices.
+- Opening Hours: Retrieve business opening hours.
+- AI Chat: Engage in conversations with AI.
+- Text Search: Search the web for text-based content.
+- Image Search: Find images on the web.
+- Video Search: Locate videos online.
+- News Search: Get the latest news articles.
+- Map Search: Search for location-based results.
+- Translation: Translate text to different languages.
+- Search Suggestions: Get suggestions based on your query.
+- Direct Answers: Retrieve direct answers to your questions.
 
 
 ## **Getting Started**
@@ -55,7 +55,7 @@ Welcome to **DuckDuckFind**, an API primarily designed to streamline search oper
     #########################
     ```
 
-_Note: The number of hashtags that define each section is not crucial, but at least 4 hashtags should be used._
+    _Note: The number of hashtags that define each section is not crucial, but at least 4 hashtags should be used._
 
 4. **Update Index:** After modifying the documents directory, re-index your documents.
 
@@ -67,120 +67,119 @@ _Note: The number of hashtags that define each section is not crucial, but at le
 
 Here are some examples of how to use the API endpoints:
 
-1. ** Search Documents **
+1. **Search Documents**
 
-Search your indexed documents for relevant content.
+    Search your indexed documents for relevant content.
 
     ```bash
     curl -X POST http://localhost:5556/search/documents -H "Content-Type: application/json" -d '{"query": "what does the duck say"}'
     ```
 
-2. ** Search Stock Price **
+2. **Search Stock Price**
 
-Retrieve the latest stock price for a given company. Update the predefined stock names in the stock_name_to_symbol dictionary within app.py.
+    Retrieve the latest stock price for a given company. Update the predefined stock names in the stock_name_to_symbol dictionary within app.py.
 
-_Note: The endpoint first checks if the query matches any stock names in the predefined list and, if found, fetches the latest closing price using yfinance. If no match is found, it performs a DuckDuckGo text search to find a relevant stock symbol, extracts it using a regex pattern, and then retrieves and returns the stock price using yfinance._
+    _Note: The endpoint first checks if the query matches any stock names in the predefined list and, if found, fetches the latest closing price using yfinance. If no match is found, it performs a DuckDuckGo text search to find a relevant stock symbol, extracts it using a regex pattern, and then retrieves and returns the stock price using yfinance._
 
     ```bash
     curl -X POST http://localhost:5556/search/stock-price -H "Content-Type: application/json" -d '{"query": "What is the stock price of Apple"}'
     ```
 
-3. ** Search Opening Hours ** 
+3. **Search Opening Hours**
 
-Retrieve opening hours for businesses. The text is examined using a regular expression pattern to extract various formats of opening hours.
+    Retrieve opening hours for businesses. The text is examined using a regular expression pattern to extract various formats of opening hours.
 
     ```bash
     curl -X POST http://localhost:5556/search/opening-hours -H "Content-Type: application/json" -d '{"query": "Opening hours of Starbucks"}'
     ```
 
-4. ** AIChat **
+4. **AI Chat**
 
-Engage in a conversational chat with an AI.
+    Engage in a conversational chat with an AI.
 
     ```bash
     curl -X POST http://localhost:5556/search/chat -H "Content-Type: application/json" -d '{"query": "Tell me a joke"}'
     ```
 
-5. ** Translate **
+5. **Translate**
 
-Translate text to a specified language.
+    Translate text to a specified language.
 
     ```bash
     curl -X POST http://localhost:5556/search/translate -H "Content-Type: application/json" -d '{"query": "Hello, how are you?", "to": "es"}'
     ```
 
-6. ** Search Text **
+6. **Search Text**
 
-Search the web for text-based content. Each result is analyzed using a sentiment analysis model, and the result with the highest sentiment score is selected.
+    Search the web for text-based content. Each result is analyzed using a sentiment analysis model, and the result with the highest sentiment score is selected.
 
     ```bash
     curl -X POST http://localhost:5556/search/text -H "Content-Type: application/json" -d '{"query": "example search query"}'
     ```
 
-7. ** Search Images **
+7. **Search Images**
 
-Search the web for images.
+    Search the web for images.
 
     ```bash
     curl -X POST http://localhost:5556/search/images -H "Content-Type: application/json" -d '{"query": "cats"}'
     ```
 
-8. ** Search Videos **
+8. **Search Videos**
 
-Search the web for videos.
+    Search the web for videos.
 
     ```bash
     curl -X POST http://localhost:5556/search/videos -H "Content-Type: application/json" -d '{"query": "funny dog videos"}'
     ```
 
-9. ** Search News **
+9. **Search News**
 
-Search the web for news articles.
+    Search the web for news articles.
 
     ```bash
     curl -X POST http://localhost:5556/search/news -H "Content-Type: application/json" -d '{"query": "latest tech news"}'
     ```
 
-10. ** Search Maps ** 
+10. **Search Maps**
 
-Search for location-based results.
+    Search for location-based results.
 
     ```bash
     curl -X POST http://localhost:5556/search/maps -H "Content-Type: application/json" -d '{"query": "best pizza near me"}'
     ```
 
-11. ** Search Suggestions ** 
+11. **Search Suggestions**
 
-Get search suggestions based on a query.
+    Get search suggestions based on a query.
 
     ```bash
     curl -X POST http://localhost:5556/search/suggestions -H "Content-Type: application/json" -d '{"query": "python programming"}'
     ```
 
-12. ** Search Answers ** 
+12. **Search Answers**
 
-Get direct answers to queries.
+    Get direct answers to queries.
 
     ```bash
     curl -X POST http://localhost:5556/search/answers -H "Content-Type: application/json" -d '{"query": "What is the capital of France?"}'
     ```
 
-13. ** Update Documents **
+13. **Update Documents**
 
-Re-index your documents when they change or new ones are added.
+    Re-index your documents when they change or new ones are added.
 
     ```bash
     curl -X POST http://localhost:5556/update/documents
     ```
 
-14. ** Download Model ** 
+14. **Download Model**
 
-Download and save a pre-trained sentiment analysis model.
+    Download and save a pre-trained sentiment analysis model.
 
     ```bash
     curl -X POST http://localhost:5556/download/model
     ```
-
 
 ## **Contributing**
 
@@ -261,4 +260,3 @@ Thank you for contributing to DuckDuckFind! ❤️🦆
 
 
 ## **Questions?**
-
