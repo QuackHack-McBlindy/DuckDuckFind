@@ -83,7 +83,7 @@ Here are some examples of how to use the API endpoints:
 
 2. **Search Stock Price**
 
-    Retrieve the latest stock price for a given company. Update the predefined stock names in the stock_name_to_symbol dictionary within app.py.
+    Retrieve the latest stock price for a given company. Update the predefined stock names in the stock_name_to_symbol dictionary within `app.py`.
 
     _Note: The endpoint first checks if the query matches any stock names in the predefined list and, if found, fetches the latest closing price using yfinance. If no match is found, it performs a DuckDuckGo text search to find a relevant stock symbol, extracts it using a regex pattern, and then retrieves and returns the stock price using yfinance._
 
