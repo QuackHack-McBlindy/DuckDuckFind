@@ -15,7 +15,13 @@ import yfinance as yf
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 ### --> Global Variables <-- ###
 doc_dir = 'documents'
-
+stock_name_to_symbol = {
+    "nvidia": "NVDA",
+    "apple": "AAPL",
+    "google": "GOOGL",
+    "microsoft": "MSFT",
+    # Add more stock names and symbols as needed
+}
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -80,20 +86,9 @@ def save_index(model, embeddings, filename='index.pkl'):
 
 app = Flask(__name__)
 
-# Initialize DDGS globally
 ddg = DDGS()
 
-# Initialize transformers pipeline for sentiment analysis (or replace with appropriate task)
 model = pipeline('sentiment-analysis', model='./model')
-
-# Static dictionary for stock names to symbols (expand as needed)
-stock_name_to_symbol = {
-    "nvidia": "NVDA",
-    "apple": "AAPL",
-    "google": "GOOGL",
-    "microsoft": "MSFT",
-    # Add more stock names and symbols as needed
-}
 
 def create_response(result):
     response_json = json.dumps(result, ensure_ascii=False)
@@ -369,10 +364,9 @@ def update_documents():
     # Index the documents
     model, embeddings = index_documents(documents)
     
-    # Save the index
     save_index(model, embeddings)
     
-    return jsonify({"message": "🦆📄Indexing complete and saved.🎈🎈"})
+    return jsonify({"message": "Indexing complete and saved."})
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
