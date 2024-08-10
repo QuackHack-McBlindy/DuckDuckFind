@@ -1,6 +1,10 @@
 # **❤️🦆🔍 -> DuckDuckFind**
 
-Welcome to **DuckDuckFind**, an API primarily designed to streamline search operations for voice assistants.
+
+<img src="https://raw.githubusercontent.com/QuackHack-McBlindy/DuckDuckFind/main/duckduckfind.png" width="200" height="150"  /> <br><br>
+
+Welcome to **DuckDuckFind**, an API primarily designed to streamline search operations for voice assistants.<br>
+
 
 **DuckDuckFind** is a versatile and powerful search API that integrates DuckDuckGo's search capabilities with sentiment analysis, document indexing, and stock price retrieval into a single Flask application. Whether you're searching the web, analyzing sentiment, managing documents, or retrieving stock prices, DuckDuckFind is equipped to handle your needs.
 
