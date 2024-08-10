@@ -1,18 +1,20 @@
-# Use an official Python runtime as a parent image
 FROM python:3.9-slim
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
 COPY . /app
 
-# Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port 5556 for the Flask app
+RUN python -c "
+from transformers import pipeline;
+sentiment_pipeline = pipeline('sentiment-analysis');
+model = sentiment_pipeline.model;
+tokenizer = sentiment_pipeline.tokenizer;
+model.save_pretrained('./model');
+tokenizer.save_pretrained('./model')
+"
+
 EXPOSE 5556
 
-# Run the command to update the documents when the container starts
-CMD ["sh", "-c", "python app.py"]
-
+CMD ["python", "app.py"]
