@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  duckduckfind:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5556:5556"
+    environment:
+      - FLASK_ENV=production
+    command: sh -c "python app.py"
+
