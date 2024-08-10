@@ -15,18 +15,16 @@ Welcome to **DuckDuckFind**, an API primarily designed to streamline search oper
 
 ## **Features**
 
-- Search Documents: Index and search your own documents.
-- Stock Price Retrieval: Get the latest stock prices.
-- Opening Hours: Retrieve business opening hours.
-- AI Chat: Engage in conversations with AI.
-- Text Search: Search the web for text-based content.
-- Image Search: Find images on the web.
-- Video Search: Locate videos online.
-- News Search: Get the latest news articles.
-- Map Search: Search for location-based results.
-- Translation: Translate text to different languages.
-- Search Suggestions: Get suggestions based on your query.
-- Direct Answers: Retrieve direct answers to your questions.
+- **Search Documents:** Index and search your own documents.
+- **Stock Price Retrieval:** Get the latest stock prices.
+- **Opening Hours:** Retrieve business opening hours.
+- **AI Chat:** Engage in conversations with AI.
+- **Text Search:** Search the web for text-based content.
+- **Image Search:** Find images on the web.
+- **Video Search:** Locate videos online.
+- **News Search:** Get the latest news articles.
+- **Translation:** Translate text to different languages.
+- **Direct Answers:** Retrieve direct answers to your questions.
 
 
 ## **Getting Started**
