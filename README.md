@@ -44,13 +44,7 @@
     cd DuckDuckFind
     ```
 
-2. **Run the Setup**: Build and start the Docker container.
-
-    ```bash
-    docker compose up -d --build
-    ```
-
-3. **Document Structure:** Place your documents in the documents directory. Structure your files as follows:
+2. **Document Structure:** Place your documents in the documents directory. Structure your files as follows:
 
     ```
     ## DEFINE SEARCH KEYWORDS HERE ##
@@ -62,6 +56,12 @@
     ```
 
     _Note: The number of hashtags that define each section is not crucial, but at least 4 hashtags should be used._
+
+3. **Run the Setup**: Build and start the Docker container.
+
+    ```bash
+    docker compose up -d --build
+    ```
 
 4. **Update Index:** After modifying the documents directory, re-index your documents.
 
