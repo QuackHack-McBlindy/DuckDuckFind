@@ -57,7 +57,7 @@ def update_settings():
     DOCS_LOGS = global_settings['DOCS_LOGS']
     DOCUMENTS_DIR = global_settings['DOCUMENTS_DIR']
     
-    return redirect(url_for('settings'))
+    return redirect(url_for('settings')
 
 
 # Global settings
