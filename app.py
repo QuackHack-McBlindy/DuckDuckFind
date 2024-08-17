@@ -12,7 +12,6 @@ import os
 
 app = Flask(__name__)
 
-
 import os
 
 # Define default values or retrieve from environment variables
@@ -23,7 +22,6 @@ MIN_SCORE_THRESHOLD = int(os.getenv("MIN_SCORE_THRESHOLD", 8))
 DOCS_LOGS = bool(int(os.getenv("DOCS_LOGS", 0)))
 DOCUMENTS_DIR = os.getenv("DOCUMENTS_DIR", "/usr/src/app/documents")
 
-# Initialize global settings
 global_settings = {
     "SEARCH_DEPTH": SEARCH_DEPTH,
     "FALLBACK_TO_AI_CHAT": FALLBACK_TO_AI_CHAT,
@@ -62,20 +60,26 @@ def update_settings():
 
 # Global settings
 important_phrases = [
-    'stänger', 'öppettider', 'när', 'tid', 'datum', 'match', 'klockan', 'pris',
+    'game', 'when', 'date', 'time', 'opening', 'open', 'close', 'stänger', 'öppettider', 'när', 'tid', 'datum', 'match', 'klockan', 'pris',
     'väder', 'regn', 'idag', 'imorgon', 'björklöven', 'björklövens'
 ]
 
 
 
 stock_name_to_symbol = {
+  # US 
     "apple": "AAPL",
+  # Sweden 
     "volvo": "VOLV-B.ST",
+  # Germany 
     "volkswagen": "VOW3.DE",
+  # 
     "l'oréal": "OR.PA",
+  #  
     "banco santander": "SAN.MC",
-    "ferrari": "RACE.MI",
+  # Norway 
     "equinor": "EQNR.OL",
+  # AU  
     "asml": "ASML.AS",
 }
 
