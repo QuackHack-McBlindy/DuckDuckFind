@@ -19,7 +19,7 @@ DuckDuckFind is designed to handle a variety of queries, from retrieving stock p
 ## **Features**
 
 - **Document Search:** Find specific content in your local files with language-specific relevance and context-aware scoring.
-- ** Stock Price Retrieval:** Instantly retrieve todays stock prices across multiple regions, tailored to your language and location.
+- **Stock Price Retrieval:** Instantly retrieve todays stock prices across multiple regions, tailored to your language and location.
 - **Smart Web Search with AI:** DuckDuckFind uses DuckDuckGo for web searches, scrapes relevant page content, and employs AI to validate and refine the results.
 - **Language Detection and Contextual Understanding:** Automatically detects the language of your queries, providing accurate and culturally relevant responses.
 - **Multi-Domain Query Handling:** From sports schedules to store hours, DuckDuckFind can handle a wide range of queries, offering deep insights and detailed answers.
@@ -33,22 +33,22 @@ To get started with DuckDuckFind, follow these steps:
 
    Clone the DuckDuckFind repository to your local machine and navigate into it.
 
-   ```
-   git clone https://github.com/QuackHack-McBlindy/DuckDuckFind.git
-   cd DuckDuckFind
-   ```
+  ```
+  git clone https://github.com/QuackHack-McBlindy/duckduckfind.git
+  cd duckduckfind
+  ```
 
 ### **2. Build and Run the Project Using Docker:**
 
    Use Docker to build and run DuckDuckFind.
 
-    ```
-    docker compose up -d --build
-    # don't like containers? you can run script as is
-    # chmod +x ddf.py
-    # sudo mv ddf.py /usr/local/bin/ddf
-    # § ddf "document how does ducks sound?"
-    ```
+  ```
+  docker compose up -d --build
+  # don't like containers? you can run script as is
+  # chmod +x ddf.py
+  # sudo mv ddf.py /usr/local/bin/ddf
+  # § ddf "document how does ducks sound?"
+  ```
 
 This will set up and run DuckDuckFind in the background, at http://localhost:5111/ ready to handle your queries.
 
@@ -69,12 +69,12 @@ This will set up and run DuckDuckFind in the background, at http://localhost:511
 
 ## **Example Usage**
 
-   *just start qwackin',* 
+   *just start qwackin',*   
    *ducks should handle the rest.*
 
- ```
- curl -X POST http://localhost:5111/ -H "Content-Type: application/json" -d '{"query": "User Qwack Here"}'
- ```
+  ```
+  curl -X POST http://localhost:5111/ -H "Content-Type: application/json" -d '{"query": "User Qwack Here"}'
+  ```
 
 ## **Contributing**
 
