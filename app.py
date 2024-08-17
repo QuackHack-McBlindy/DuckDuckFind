@@ -16,10 +16,10 @@ app = Flask(__name__)
 import os
 
 # Define default values or retrieve from environment variables
-SEARCH_DEPTH = int(os.getenv("SEARCH_DEPTH", 3))
+SEARCH_DEPTH = int(os.getenv("SEARCH_DEPTH", 40))
 FALLBACK_TO_AI_CHAT = bool(int(os.getenv("FALLBACK_TO_AI_CHAT", 1)))
 LOOP_UNTIL_SUCCESS = bool(int(os.getenv("LOOP_UNTIL_SUCCESS", 0)))
-MIN_SCORE_THRESHOLD = int(os.getenv("MIN_SCORE_THRESHOLD", 5))
+MIN_SCORE_THRESHOLD = int(os.getenv("MIN_SCORE_THRESHOLD", 8))
 DOCS_LOGS = bool(int(os.getenv("DOCS_LOGS", 0)))
 DOCUMENTS_DIR = os.getenv("DOCUMENTS_DIR", "/usr/src/app/documents")
 
