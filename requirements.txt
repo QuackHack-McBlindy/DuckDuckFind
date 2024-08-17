@@ -1,8 +1,8 @@
 Flask
-sentence-transformers
-scikit-learn
-numpy
+requests
+beautifulsoup4
 duckduckgo-search
-transformers
-torch
 yfinance
+langdetect
+langcodes[full]
+gunicorn
