@@ -2,7 +2,7 @@
 
 ![DuckDuckFind Logo](https://raw.githubusercontent.com/QuackHack-McBlindy/DuckDuckFind/main/duckduckfind.png)
 
-Welcome to **DuckDuckFind**, a cutting-edge tool that enhances the way you search for information across the web and your local files. DuckDuckFind utilizes the DuckDuckGo search engine, intelligent language detection, and advanced web scraping techniques to extract and verify data. It doesn't just stop there—DuckDuckFind can also leverage AI to process and refine the information it gathers, ensuring you get accurate and relevant results every time.
+Welcome to **DuckDuckFind**, a cutting-edge tool that enhances the way you search for information across the web and your local files. DuckDuckFind utilizes the DuckDuckGo search engine, intelligent language detection, and advanced web scraping techniques to extract and verify data. Qwack?! -—DuckDuckFind also leverage AI to process and refine the information it gathers, ensuring you get accurate and relevant results every time.
 
 DuckDuckFind is designed to handle a variety of queries, from retrieving stock prices and searching through local documents to pulling relevant information from web pages. Whether you're looking up the next game of your favorite sports team or checking the opening hours of a local store, DuckDuckFind works to gather and refine this information, providing you with clear and concise answers. It’s a versatile tool that brings advanced search capabilities to your fingertips.
 
@@ -23,7 +23,7 @@ DuckDuckFind is designed to handle a variety of queries, from retrieving stock p
 - **Smart Web Search with AI:** DuckDuckFind uses DuckDuckGo for web searches, scrapes relevant page content, and employs AI to validate and refine the results.
 - **Language Detection and Contextual Understanding:** Automatically detects the language of your queries, providing accurate and culturally relevant responses.
 - **Multi-Domain Query Handling:** From sports schedules to store hours, DuckDuckFind can handle a wide range of queries, offering deep insights and detailed answers.
-- **Highly Configurable:** Customize search depth, logging, document directories, and more to suit your specific needs.
+- **Configurable:** Customize search depth, logging, document directories, and more to suit your specific needs.
 
 ## **Getting Started**
 
@@ -33,7 +33,7 @@ To get started with DuckDuckFind, follow these steps:
 
    Clone the DuckDuckFind repository to your local machine and navigate into it.
 
-    ```bash
+    ```
     git clone https://github.com/QuackHack-McBlindy/DuckDuckFind.git
     cd DuckDuckFind
     ```
@@ -42,13 +42,25 @@ To get started with DuckDuckFind, follow these steps:
 
    Use Docker to build and run DuckDuckFind.
 
-    ```bash
+    ```
     docker compose up -d --build
     ```
 
-This will set up and run DuckDuckFind in the background, ready to handle your queries.
+This will set up and run DuckDuckFind in the background, at http://localhost:5111 ready to handle your queries.
+
+### **3. Settings:**
+
+   Go see settings.
+
+   ```
+   http://localhost:5111/settings
+   ```
 
 ## **Example Usage**
+
+   ```
+   curl -X POST http://localhost:5111/ -H "Content-Type: application/json" -d '{"query": "Your Search Query"}'
+   ```
 
 ## **Contributing**
 
