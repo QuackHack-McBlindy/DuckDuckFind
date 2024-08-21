@@ -1,63 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        h1 {
-            color: #333;
-        }
-        form {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        fieldset {
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        legend {
-            font-weight: bold;
-            color: #666;
-        }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            color: #333;
-        }
-        input[type="text"],
-        input[type="number"],
-        input[type="range"] {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        input[type="checkbox"] {
-            margin-right: 10px;
-        }
-        button {
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-    </style>
 </head>
 <body>
     <h1>Settings</h1>
@@ -66,29 +13,27 @@
             <legend>Global Settings</legend>
 
             <label for="search_depth">Search Depth:</label>
-            <input type="range" id="search_depth" name="search_depth" min="10" max="100" value="{{ SEARCH_DEPTH }}" oninput="this.nextElementSibling.value = this.value">
-            <output>{{ SEARCH_DEPTH }}</output>
+            <input type="number" id="search_depth" name="search_depth" value="{{ search_depth }}" required>
             <br>
 
             <label for="fallback_to_ai_chat">Fallback to AI Chat:</label>
-            <input type="checkbox" id="fallback_to_ai_chat" name="fallback_to_ai_chat" {% if FALLBACK_TO_AI_CHAT %}checked{% endif %}>
+            <input type="checkbox" id="fallback_to_ai_chat" name="fallback_to_ai_chat" {% if fallback_to_ai_chat %}checked{% endif %}>
             <br>
 
             <label for="loop_until_success">Loop Until Success:</label>
-            <input type="checkbox" id="loop_until_success" name="loop_until_success" {% if LOOP_UNTIL_SUCCESS %}checked{% endif %}>
+            <input type="checkbox" id="loop_until_success" name="loop_until_success" {% if loop_until_success %}checked{% endif %}>
             <br>
 
             <label for="min_score_threshold">Minimal Score Threshold:</label>
-            <input type="range" id="min_score_threshold" name="min_score_threshold" min="1" max="20" value="{{ MIN_SCORE_THRESHOLD }}" oninput="this.nextElementSibling.value = this.value">
-            <output>{{ MIN_SCORE_THRESHOLD }}</output>
+            <input type="number" id="min_score_threshold" name="min_score_threshold" value="{{ min_score_threshold }}" required>
             <br>
 
             <label for="docs_logs">Document Logs:</label>
-            <input type="checkbox" id="docs_logs" name="docs_logs" {% if DOCS_LOGS %}checked{% endif %}>
+            <input type="checkbox" id="docs_logs" name="docs_logs" {% if docs_logs %}checked{% endif %}>
             <br>
 
             <label for="documents_dir">Documents Directory:</label>
-            <input type="text" id="documents_dir" name="documents_dir" value="{{ DOCUMENTS_DIR }}" required>
+            <input type="text" id="documents_dir" name="documents_dir" value="{{ documents_dir }}" required>
             <br>
 
             <button type="submit">Update Settings</button>
