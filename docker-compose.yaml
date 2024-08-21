@@ -2,14 +2,11 @@ version: '3.8'
 
 services:
   duckduckfind:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     ports:
-      - "5111:5111"
-    volumes:
-      - ./documents:/app/documents
+      - "5556:5556"
     environment:
-      - FLASK_ENV=production
-    command: sh -c "python app.py"
-
+      FLASK_ENV: development
+    volumes:
+      - ${HOME}/Documents:/root/Documents
+    user: "1000:1000"  # Ensure container runs with a specific user to avoid permission issues
