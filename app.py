@@ -12,9 +12,6 @@ import os
 
 app = Flask(__name__)
 
-
-import os
-
 # Define default values or retrieve from environment variables
 SEARCH_DEPTH = int(os.getenv("SEARCH_DEPTH", 40))
 FALLBACK_TO_AI_CHAT = bool(int(os.getenv("FALLBACK_TO_AI_CHAT", 1)))
@@ -32,7 +29,6 @@ global_settings = {
     "DOCS_LOGS": DOCS_LOGS,
     "DOCUMENTS_DIR": DOCUMENTS_DIR
 }
-
 
 @app.route('/settings', methods=['GET'])
 def settings():
@@ -57,16 +53,13 @@ def update_settings():
     DOCS_LOGS = global_settings['DOCS_LOGS']
     DOCUMENTS_DIR = global_settings['DOCUMENTS_DIR']
     
-    return redirect(url_for('settings')
-
+    return redirect(url_for('settings'))
 
 # Global settings
 important_phrases = [
     'stänger', 'öppettider', 'när', 'tid', 'datum', 'match', 'klockan', 'pris',
     'väder', 'regn', 'idag', 'imorgon', 'björklöven', 'björklövens'
 ]
-
-
 
 stock_name_to_symbol = {
     "apple": "AAPL",
