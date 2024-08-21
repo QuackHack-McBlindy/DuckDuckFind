@@ -1,85 +1,36 @@
-
-from flask import Flask, request, jsonify, render_template, redirect, url_for
-import sys
+from flask import Flask, request, render_template, redirect, url_for, Response
+import os
+import logging
+import yfinance as yf
 import re
 import requests
 from bs4 import BeautifulSoup
 from duckduckgo_search import DDGS
-import yfinance as yf
 from langdetect import detect, LangDetectException
 from langcodes import Language
-import logging
-import os
 
 app = Flask(__name__)
 
-
-import os
-
-# Define default values or retrieve from environment variables
-SEARCH_DEPTH = int(os.getenv("SEARCH_DEPTH", 40))
-FALLBACK_TO_AI_CHAT = bool(int(os.getenv("FALLBACK_TO_AI_CHAT", 1)))
-LOOP_UNTIL_SUCCESS = bool(int(os.getenv("LOOP_UNTIL_SUCCESS", 0)))
-MIN_SCORE_THRESHOLD = int(os.getenv("MIN_SCORE_THRESHOLD", 8))
-DOCS_LOGS = bool(int(os.getenv("DOCS_LOGS", 0)))
-DOCUMENTS_DIR = os.getenv("DOCUMENTS_DIR", "/usr/src/app/documents")
-
-# Initialize global settings
-global_settings = {
-    "SEARCH_DEPTH": SEARCH_DEPTH,
-    "FALLBACK_TO_AI_CHAT": FALLBACK_TO_AI_CHAT,
-    "LOOP_UNTIL_SUCCESS": LOOP_UNTIL_SUCCESS,
-    "MIN_SCORE_THRESHOLD": MIN_SCORE_THRESHOLD,
-    "DOCS_LOGS": DOCS_LOGS,
-    "DOCUMENTS_DIR": DOCUMENTS_DIR
-}
-
-
-@app.route('/settings', methods=['GET'])
-def settings():
-    return render_template('settings.html', **global_settings)
-
-@app.route('/update-settings', methods=['POST'])
-def update_settings():
-    global global_settings
-    global_settings['SEARCH_DEPTH'] = int(request.form['search_depth'])
-    global_settings['FALLBACK_TO_AI_CHAT'] = 'fallback_to_ai_chat' in request.form
-    global_settings['LOOP_UNTIL_SUCCESS'] = 'loop_until_success' in request.form
-    global_settings['MIN_SCORE_THRESHOLD'] = int(request.form['min_score_threshold'])
-    global_settings['DOCS_LOGS'] = 'docs_logs' in request.form
-    global_settings['DOCUMENTS_DIR'] = request.form['documents_dir']
-    
-    # Update global variables
-    global SEARCH_DEPTH, FALLBACK_TO_AI_CHAT, LOOP_UNTIL_SUCCESS, MIN_SCORE_THRESHOLD, DOCS_LOGS, DOCUMENTS_DIR
-    SEARCH_DEPTH = global_settings['SEARCH_DEPTH']
-    FALLBACK_TO_AI_CHAT = global_settings['FALLBACK_TO_AI_CHAT']
-    LOOP_UNTIL_SUCCESS = global_settings['LOOP_UNTIL_SUCCESS']
-    MIN_SCORE_THRESHOLD = global_settings['MIN_SCORE_THRESHOLD']
-    DOCS_LOGS = global_settings['DOCS_LOGS']
-    DOCUMENTS_DIR = global_settings['DOCUMENTS_DIR']
-    
-    return redirect(url_for('settings'))
-
-
-# Global settings
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+### --> GLOBAL SETTINGS <-- ###
+SEARCH_DEPTH = 40
+FALLBACK_TO_AI_CHAT = True
+LOOP_UNTIL_SUCCESS = False
+DOCUMENTS_DIR = os.path.expanduser("~/Documents")
+MIN_SCORE_THRESHOLD = 8
 important_phrases = [
-    'stänger', 'öppettider', 'när', 'tid', 'datum', 'match', 'klockan', 'pris',
+    'stänger', 'öppettider', 'när', 'tid', 'datum', 'match', 'klockan', 'pris', 
     'väder', 'regn', 'idag', 'imorgon', 'björklöven', 'björklövens'
 ]
-
-
-
+DOCS_LOGS = True
 stock_name_to_symbol = {
     "apple": "AAPL",
     "volvo": "VOLV-B.ST",
     "volkswagen": "VOW3.DE",
     "l'oréal": "OR.PA",
-    "banco santander": "SAN.MC",
-    "ferrari": "RACE.MI",
     "equinor": "EQNR.OL",
     "asml": "ASML.AS",
 }
-
 document_terms = {
     "english": "document",
     "swedish": "dokument",
@@ -90,7 +41,6 @@ document_terms = {
     "norwegian": "dokument",
     "dutch": "document",
 }
-
 stock_terms = {
     "english": "stock",
     "swedish": "aktie",
@@ -101,7 +51,6 @@ stock_terms = {
     "norwegian": "aksje",
     "dutch": "aandeel",
 }
-
 language_to_country_code = {
     "swedish": ".ST",
     "english": "",
@@ -112,7 +61,6 @@ language_to_country_code = {
     "norwegian": ".OL",
     "dutch": ".AS",
 }
-
 language_to_output_format = {
     "swedish_kr": "Priset på en {symbol} aktie är: {price:.2f} kr",
     "swedish_dollar": "Priset på en {symbol} aktie är: {price:.2f} dollar",
@@ -124,6 +72,7 @@ language_to_output_format = {
     "norwegian": "Prisen på en {symbol} aksje er {price:.2f} kr.",
     "dutch": "De huidige prijs van een {symbol} aandeel is {price:.2f} €.",
 }
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 logging.basicConfig(level=logging.INFO)
 docs_logger = logging.getLogger('docs_logs')
@@ -175,7 +124,8 @@ def parse_description_for_answer(results, user_input):
 
 def inspect_page_source(url, user_input):
     try:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
         for attempt in range(3):
             try:
                 page = requests.get(url, headers=headers, timeout=10)
@@ -270,10 +220,7 @@ def fetch_stock_data(symbol):
 
 def format_output(symbol, price, language):
     if language == "swedish":
-        if symbol.endswith(".ST"):
-            output_format = language_to_output_format["swedish_kr"]
-        else:
-            output_format = language_to_output_format["swedish_dollar"]
+        output_format = language_to_output_format["swedish_kr"] if symbol.endswith(".ST") else language_to_output_format["swedish_dollar"]
     else:
         output_format = language_to_output_format.get(language, language_to_output_format["english"])
     return output_format.format(symbol=symbol, price=price)
@@ -315,34 +262,62 @@ def document_search(query):
         docs_logger.info(f"Starting document search in directory: {DOCUMENTS_DIR}")
     documents = load_documents(DOCUMENTS_DIR)
     results = search_documents([cleaned_query], documents)
-    return results
+    if results:
+        for path, snippet, _ in results:
+            formatted_path = format_path(path)
+            return f"Your search for '{cleaned_query}' was found in: {formatted_path}\n{snippet}\n"
+    else:
+        return "No results found."
 
 @app.route('/', methods=['POST'])
-def handle_query():
+def handle_request():
     data = request.json
-    user_query = data.get("query", "")
+    query = data.get('query', '')
     
-    if check_for_document_related_terms(user_query):
-        results = document_search(user_query)
-        if results:
-            formatted_results = [{
-                "path": format_path(path),
-                "snippet": snippet
-            } for path, snippet, _ in results]
-            return jsonify({"results": formatted_results})
-        else:
-            return jsonify({"message": "No results found."})
-    elif check_for_stock_related_terms(user_query):
-        result = get_stock_price(user_query)
+    if check_for_document_related_terms(query):
+        response = document_search(query)
+    elif check_for_stock_related_terms(query):
+        result = get_stock_price(query)
         if "error" in result:
-            return jsonify({"error": result['error']})
+            response = f"Error: {result['error']}"
         else:
-            detected_language = detect_language(user_query)
-            output = format_output(result["symbol"], result["price"], detected_language)
-            return jsonify({"stock_price": output})
+            detected_language = detect_language(query)
+            response = format_output(result["symbol"], result["price"], detected_language)
     else:
-        response = ai_chat(user_query)
-        return jsonify({"response": response})
+        response = ai_chat(query)
+    
+    return Response(response, mimetype='text/plain')
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5556, debug=True)
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    global SEARCH_DEPTH, FALLBACK_TO_AI_CHAT, LOOP_UNTIL_SUCCESS, DOCUMENTS_DIR, MIN_SCORE_THRESHOLD, DOCS_LOGS, important_phrases, stock_name_to_symbol, document_terms, stock_terms, language_to_country_code, language_to_output_format
+    if request.method == 'POST':
+        SEARCH_DEPTH = int(request.form.get('search_depth', 40))
+        FALLBACK_TO_AI_CHAT = request.form.get('fallback_to_ai_chat', 'off') == 'on'
+        LOOP_UNTIL_SUCCESS = request.form.get('loop_until_success', 'off') == 'on'
+        DOCUMENTS_DIR = request.form.get('documents_dir', os.path.expanduser("~/Documents"))
+        MIN_SCORE_THRESHOLD = int(request.form.get('min_score_threshold', 8))
+        DOCS_LOGS = request.form.get('docs_logs', 'off') == 'on'
+        important_phrases = request.form.get('important_phrases', '').split(',')
+        stock_name_to_symbol = dict(item.split(':') for item in request.form.get('stock_name_to_symbol', '').split(';'))
+        document_terms = dict(item.split(':') for item in request.form.get('document_terms', '').split(';'))
+        stock_terms = dict(item.split(':') for item in request.form.get('stock_terms', '').split(';'))
+        language_to_country_code = dict(item.split(':') for item in request.form.get('language_to_country_code', '').split(';'))
+        language_to_output_format = dict(item.split(':') for item in request.form.get('language_to_output_format', '').split(';'))
+        return redirect(url_for('settings'))
+    return render_template('settings.html', 
+                           search_depth=SEARCH_DEPTH,
+                           fallback_to_ai_chat=FALLBACK_TO_AI_CHAT,
+                           loop_until_success=LOOP_UNTIL_SUCCESS,
+                           documents_dir=DOCUMENTS_DIR,
+                           min_score_threshold=MIN_SCORE_THRESHOLD,
+                           docs_logs=DOCS_LOGS,
+                           important_phrases=', '.join(important_phrases),
+                           stock_name_to_symbol='; '.join(f'{k}:{v}' for k, v in stock_name_to_symbol.items()),
+                           document_terms='; '.join(f'{k}:{v}' for k, v in document_terms.items()),
+                           stock_terms='; '.join(f'{k}:{v}' for k, v in stock_terms.items()),
+                           language_to_country_code='; '.join(f'{k}:{v}' for k, v in language_to_country_code.items()),
+                           language_to_output_format='; '.join(f'{k}:{v}' for k, v in language_to_output_format.items()))
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5556)
