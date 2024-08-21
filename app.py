@@ -212,112 +212,117 @@ def get_stock_price(query):
 
 def fetch_stock_data(symbol):
     stock = yf.Ticker(symbol)
-    history_data = stock.history(period='1mo')
-    if not history_data.empty:
-        price = history_data['Close'].iloc[-1]
-        return {"symbol": symbol, "price": price}
-    return {"error": f"No price data found for {symbol}. This stock may be delisted or not available."}
+    price = stock.history(period="1d").iloc[-1]['Close']
+    return {"symbol": symbol, "price": price}
 
-def format_output(symbol, price, language):
-    if language == "swedish":
-        output_format = language_to_output_format["swedish_kr"] if symbol.endswith(".ST") else language_to_output_format["swedish_dollar"]
-    else:
-        output_format = language_to_output_format.get(language, language_to_output_format["english"])
-    return output_format.format(symbol=symbol, price=price)
-
-def load_documents(doc_dir):
-    documents = {}
-    for root, _, files in os.walk(doc_dir):
-        for file in files:
-            if file.endswith(".txt"):
-                path = os.path.join(root, file)
-                with open(path, 'r', encoding='utf-8') as file_obj:
-                    documents[path] = file_obj.read()
-    return documents
-
-def search_documents(queries, documents):
-    results = []
-    for query in queries:
-        query = query.lower()
-        for path, text in documents.items():
-            if DOCS_LOGS:
-                docs_logger.info(f"Searching in file: {path}, with query: '{query}'")
-            if query in text.lower():
-                start = text.lower().index(query)
-                snippet = text[max(0, start - 50):start + 500]
-                results.append((path, snippet, query))
-    return results
-
-def format_path(path):
-    parts = path.split('/')
-    if len(parts) > 1:
-        return f"/{parts[-2]}  / {parts[-1]}"
-    return path
-
-def document_search(query):
-    language = detect_language(query)
-    cleaned_query = clean_query(query, language)
-    cleaned_query = cleaned_query.lower()
-    if DOCS_LOGS:
-        docs_logger.info(f"Starting document search in directory: {DOCUMENTS_DIR}")
-    documents = load_documents(DOCUMENTS_DIR)
-    results = search_documents([cleaned_query], documents)
-    if results:
-        for path, snippet, _ in results:
-            formatted_path = format_path(path)
-            return f"Your search for '{cleaned_query}' was found in: {formatted_path}\n{snippet}\n"
-    else:
-        return "No results found."
-
-@app.route('/', methods=['POST'])
-def handle_request():
-    data = request.json
-    query = data.get('query', '')
-    
-    if check_for_document_related_terms(query):
-        response = document_search(query)
-    elif check_for_stock_related_terms(query):
-        result = get_stock_price(query)
-        if "error" in result:
-            response = f"Error: {result['error']}"
+@app.route("/", methods=["GET", "POST"])
+def index():
+    if request.method == "POST":
+        user_input = request.form.get("user_input", "")
+        if check_for_stock_related_terms(user_input):
+            stock_price = get_stock_price(user_input)
+            if "error" in stock_price:
+                return render_template("index.html", result=stock_price["error"])
+            detected_language = detect_language(user_input)
+            output_format = language_to_output_format.get(detected_language, language_to_output_format["english"])
+            result = output_format.format(symbol=stock_price["symbol"], price=stock_price["price"])
+        elif check_for_document_related_terms(user_input):
+            result = f"The document related to your query is being processed."
         else:
-            detected_language = detect_language(query)
-            response = format_output(result["symbol"], result["price"], detected_language)
-    else:
-        response = ai_chat(query)
-    
-    return Response(response, mimetype='text/plain')
+            result = ai_chat(user_input)
+        return render_template("index.html", result=result)
+    return render_template("index.html", result="")
 
-@app.route('/settings', methods=['GET', 'POST'])
+@app.route("/settings", methods=["GET", "POST"])
 def settings():
-    global SEARCH_DEPTH, FALLBACK_TO_AI_CHAT, LOOP_UNTIL_SUCCESS, DOCUMENTS_DIR, MIN_SCORE_THRESHOLD, DOCS_LOGS, important_phrases, stock_name_to_symbol, document_terms, stock_terms, language_to_country_code, language_to_output_format
-    if request.method == 'POST':
-        SEARCH_DEPTH = int(request.form.get('search_depth', 40))
-        FALLBACK_TO_AI_CHAT = request.form.get('fallback_to_ai_chat', 'off') == 'on'
-        LOOP_UNTIL_SUCCESS = request.form.get('loop_until_success', 'off') == 'on'
-        DOCUMENTS_DIR = request.form.get('documents_dir', os.path.expanduser("~/Documents"))
-        MIN_SCORE_THRESHOLD = int(request.form.get('min_score_threshold', 8))
-        DOCS_LOGS = request.form.get('docs_logs', 'off') == 'on'
-        important_phrases = request.form.get('important_phrases', '').split(',')
-        stock_name_to_symbol = dict(item.split(':') for item in request.form.get('stock_name_to_symbol', '').split(';'))
-        document_terms = dict(item.split(':') for item in request.form.get('document_terms', '').split(';'))
-        stock_terms = dict(item.split(':') for item in request.form.get('stock_terms', '').split(';'))
-        language_to_country_code = dict(item.split(':') for item in request.form.get('language_to_country_code', '').split(';'))
-        language_to_output_format = dict(item.split(':') for item in request.form.get('language_to_output_format', '').split(';'))
-        return redirect(url_for('settings'))
-    return render_template('settings.html', 
-                           search_depth=SEARCH_DEPTH,
-                           fallback_to_ai_chat=FALLBACK_TO_AI_CHAT,
-                           loop_until_success=LOOP_UNTIL_SUCCESS,
-                           documents_dir=DOCUMENTS_DIR,
-                           min_score_threshold=MIN_SCORE_THRESHOLD,
-                           docs_logs=DOCS_LOGS,
-                           important_phrases=', '.join(important_phrases),
-                           stock_name_to_symbol='; '.join(f'{k}:{v}' for k, v in stock_name_to_symbol.items()),
-                           document_terms='; '.join(f'{k}:{v}' for k, v in document_terms.items()),
-                           stock_terms='; '.join(f'{k}:{v}' for k, v in stock_terms.items()),
-                           language_to_country_code='; '.join(f'{k}:{v}' for k, v in language_to_country_code.items()),
-                           language_to_output_format='; '.join(f'{k}:{v}' for k, v in language_to_output_format.items()))
+    global SEARCH_DEPTH, FALLBACK_TO_AI_CHAT, LOOP_UNTIL_SUCCESS, DOCUMENTS_DIR, MIN_SCORE_THRESHOLD, stock_name_to_symbol, document_terms, stock_terms, language_to_country_code, language_to_output_format
+    if request.method == "POST":
+        try:
+            SEARCH_DEPTH = int(request.form.get("SEARCH_DEPTH", SEARCH_DEPTH))
+            FALLBACK_TO_AI_CHAT = request.form.get("FALLBACK_TO_AI_CHAT", "on") == "on"
+            LOOP_UNTIL_SUCCESS = request.form.get("LOOP_UNTIL_SUCCESS", "on") == "on"
+            DOCUMENTS_DIR = request.form.get("DOCUMENTS_DIR", DOCUMENTS_DIR)
+            MIN_SCORE_THRESHOLD = int(request.form.get("MIN_SCORE_THRESHOLD", MIN_SCORE_THRESHOLD))
+            
+            # Update stock_name_to_symbol
+            stock_name_to_symbol = dict(item.split(':') for item in request.form.get('stock_name_to_symbol', '').split(';') if ':' in item)
+            
+            # Update document_terms
+            document_terms = dict(item.split(':') for item in request.form.get('document_terms', '').split(';') if ':' in item)
+            
+            # Update stock_terms
+            stock_terms = dict(item.split(':') for item in request.form.get('stock_terms', '').split(';') if ':' in item)
+            
+            # Update language_to_country_code
+            language_to_country_code = dict(item.split(':') for item in request.form.get('language_to_country_code', '').split(';') if ':' in item)
+            
+            # Update language_to_output_format
+            language_to_output_format = dict(item.split(':') for item in request.form.get('language_to_output_format', '').split(';') if ':' in item)
+
+            docs_logger.info("Settings updated.")
+        except Exception as e:
+            logging.error(f"Error updating settings: {e}")
+    return render_template("settings.html")
+
+@app.route("/reset", methods=["POST"])
+def reset():
+    global SEARCH_DEPTH, FALLBACK_TO_AI_CHAT, LOOP_UNTIL_SUCCESS, DOCUMENTS_DIR, MIN_SCORE_THRESHOLD, stock_name_to_symbol, document_terms, stock_terms, language_to_country_code, language_to_output_format
+    SEARCH_DEPTH = 40
+    FALLBACK_TO_AI_CHAT = True
+    LOOP_UNTIL_SUCCESS = False
+    DOCUMENTS_DIR = os.path.expanduser("~/Documents")
+    MIN_SCORE_THRESHOLD = 8
+    stock_name_to_symbol = {
+        "apple": "AAPL",
+        "volvo": "VOLV-B.ST",
+        "volkswagen": "VOW3.DE",
+        "l'oréal": "OR.PA",
+        "equinor": "EQNR.OL",
+        "asml": "ASML.AS",
+    }
+    document_terms = {
+        "english": "document",
+        "swedish": "dokument",
+        "german": "dokument",
+        "french": "document",
+        "spanish": "documento",
+        "italian": "documento",
+        "norwegian": "dokument",
+        "dutch": "document",
+    }
+    stock_terms = {
+        "english": "stock",
+        "swedish": "aktie",
+        "german": "aktie",
+        "french": "action",
+        "spanish": "acción",
+        "italian": "azione",
+        "norwegian": "aksje",
+        "dutch": "aandeel",
+    }
+    language_to_country_code = {
+        "swedish": ".ST",
+        "english": "",
+        "german": ".DE",
+        "french": ".PA",
+        "spanish": ".MC",
+        "italian": ".MI",
+        "norwegian": ".OL",
+        "dutch": ".AS",
+    }
+    language_to_output_format = {
+        "swedish_kr": "Priset på en {symbol} aktie är: {price:.2f} kr",
+        "swedish_dollar": "Priset på en {symbol} aktie är: {price:.2f} dollar",
+        "english": "The current price of a {symbol} stock is ${price:.2f}.",
+        "german": "Der aktuelle Preis einer {symbol} Aktie beträgt {price:.2f} €.",
+        "french": "Le prix actuel d'une action {symbol} est de {price:.2f} €.",
+        "spanish": "El precio actual de una acción de {symbol} es {price:.2f} €.",
+        "italian": "Il prezzo attuale di un'azione {symbol} è {price:.2f} €.",
+        "norwegian": "Prisen på en {symbol} aksje er {price:.2f} kr.",
+        "dutch": "De huidige prijs van een {symbol} aandeel is {price:.2f} €.",
+    }
+    docs_logger.info("Settings reset.")
+    return redirect(url_for('settings'))
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5556)
+    app.run(debug=True)
