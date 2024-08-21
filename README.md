@@ -2,9 +2,9 @@
 
 ![DuckDuckFind Logo](https://raw.githubusercontent.com/QuackHack-McBlindy/DuckDuckFind/main/duckduckfind.png)
 
-Welcome to **DuckDuckFind**, a cutting-edge tool that enhances the way you search for information across the web and your local files. DuckDuckFind utilizes the DuckDuckGo search engine, intelligent language detection, and advanced web scraping techniques to extract and verify data. Qwack?! -—DuckDuckFind also leverage AI to process and refine the information it gathers, ensuring you get accurate and relevant results every time.
+Welcome to **DuckDuckFind**— a cutting-edge tool that revolutionizes how you search for information across the web and your local files. DuckDuckFind harnesses the power of the DuckDuckGo search engine, intelligent language detection, and advanced web scraping techniques to extract and verify data. Qwack?! —DuckDuckFind also leverages AI to process and refine the information it gathers, ensuring you receive accurate and relevant results every time.
 
-DuckDuckFind is designed to handle a variety of queries, from retrieving stock prices and searching through local documents to pulling relevant information from web pages. Whether you're looking up the next game of your favorite sports team or checking the opening hours of a local store, DuckDuckFind works to gather and refine this information, providing you with clear and concise answers. It’s a versatile tool that brings advanced search capabilities to your fingertips.
+Originally designed for use with voice assistants, DuckDuckFind can be utilized in various other ways. It’s built to handle a wide range of queries, from retrieving stock prices and searching through local documents to pulling relevant information from web pages. Whether you’re checking the next game of your favorite sports team or looking up the opening hours of a local store, DuckDuckFind works to gather and refine this information, providing you with clear and concise answers. It’s a versatile tool that brings advanced search capabilities to your fingertips.
 
 ## **Table of Contents**
 
