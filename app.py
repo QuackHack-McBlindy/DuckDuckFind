@@ -18,7 +18,7 @@ settings = {
     "SEARCH_DEPTH": 40,
     "FALLBACK_TO_AI_CHAT": True,
     "LOOP_UNTIL_SUCCESS": False,
-    "DOCUMENTS_DIR": os.path.expanduser("~/Documents"),
+    "DOCUMENTS_DIR": "/app/Documents",
     "MIN_SCORE_THRESHOLD": 8,
     "DOCS_LOGS": True,
     "important_phrases": [
