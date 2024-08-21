@@ -8,5 +8,5 @@ services:
     environment:
       FLASK_ENV: development
     volumes:
-      - ${HOME}/Documents:/root/Documents
+      - ./documents:/app/Documents
     user: "1000:1000"  # Ensure container runs with a specific user to avoid permission issues
