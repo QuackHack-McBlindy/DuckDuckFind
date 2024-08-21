@@ -54,10 +54,16 @@ This will set up and run DuckDuckFind in the background, at http://localhost:511
 
 ### **3. Settings:**
 
-   Go see settings.
+   Go see settings at http://localhost:5556/settings
+   To achieve the best results, you should fully control the scoring system by adjusting the settings.  <br>
+   Specifically:
+
+    1. Add words to the Important Phrases list.
+    2. Adjust the Minimal Score Threshold.
+
+For each word in your query that matches a word in the search result, the result earns +1 score. If the word also appears in the Important Phrases, it earns an additional +1 score.
 
   ```
-  http://localhost:5556/settings
   # default values
   # Search Depth: 40
   # Fallback to AI Chat: 1
