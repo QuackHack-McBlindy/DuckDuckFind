@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,36 +7,44 @@
 </head>
 <body>
     <h1>Settings</h1>
-    <form action="/update-settings" method="post">
-        <fieldset>
-            <legend>Global Settings</legend>
+    <form action="/settings" method="post">
+        <label for="search_depth">Search Depth:</label>
+        <input type="number" id="search_depth" name="search_depth" value="{{ search_depth }}"><br><br>
+        
+        <label for="fallback_to_ai_chat">Fallback to AI Chat:</label>
+        <input type="checkbox" id="fallback_to_ai_chat" name="fallback_to_ai_chat" {% if fallback_to_ai_chat %}checked{% endif %}><br><br>
+        
+        <label for="loop_until_success">Loop Until Success:</label>
+        <input type="checkbox" id="loop_until_success" name="loop_until_success" {% if loop_until_success %}checked{% endif %}><br><br>
+        
+        <label for="documents_dir">Documents Directory:</label>
+        <input type="text" id="documents_dir" name="documents_dir" value="{{ documents_dir }}"><br><br>
+        
+        <label for="min_score_threshold">Minimum Score Threshold:</label>
+        <input type="number" id="min_score_threshold" name="min_score_threshold" value="{{ min_score_threshold }}"><br><br>
+        
+        <label for="docs_logs">Enable Document Logs:</label>
+        <input type="checkbox" id="docs_logs" name="docs_logs" {% if docs_logs %}checked{% endif %}><br><br>
 
-            <label for="search_depth">Search Depth:</label>
-            <input type="number" id="search_depth" name="search_depth" value="{{ search_depth }}" required>
-            <br>
+        <label for="important_phrases">Important Phrases (comma-separated):</label>
+        <input type="text" id="important_phrases" name="important_phrases" value="{{ important_phrases }}"><br><br>
+        
+        <label for="stock_name_to_symbol">Stock Name to Symbol (key:value pairs, semi-colon separated):</label>
+        <input type="text" id="stock_name_to_symbol" name="stock_name_to_symbol" value="{{ stock_name_to_symbol }}"><br><br>
+        
+        <label for="document_terms">Document Terms (language:term pairs, semi-colon separated):</label>
+        <input type="text" id="document_terms" name="document_terms" value="{{ document_terms }}"><br><br>
+        
+        <label for="stock_terms">Stock Terms (language:term pairs, semi-colon separated):</label>
+        <input type="text" id="stock_terms" name="stock_terms" value="{{ stock_terms }}"><br><br>
+        
+        <label for="language_to_country_code">Language to Country Code (language:code pairs, semi-colon separated):</label>
+        <input type="text" id="language_to_country_code" name="language_to_country_code" value="{{ language_to_country_code }}"><br><br>
+        
+        <label for="language_to_output_format">Language to Output Format (language:format pairs, semi-colon separated):</label>
+        <input type="text" id="language_to_output_format" name="language_to_output_format" value="{{ language_to_output_format }}"><br><br>
 
-            <label for="fallback_to_ai_chat">Fallback to AI Chat:</label>
-            <input type="checkbox" id="fallback_to_ai_chat" name="fallback_to_ai_chat" {% if fallback_to_ai_chat %}checked{% endif %}>
-            <br>
-
-            <label for="loop_until_success">Loop Until Success:</label>
-            <input type="checkbox" id="loop_until_success" name="loop_until_success" {% if loop_until_success %}checked{% endif %}>
-            <br>
-
-            <label for="min_score_threshold">Minimal Score Threshold:</label>
-            <input type="number" id="min_score_threshold" name="min_score_threshold" value="{{ min_score_threshold }}" required>
-            <br>
-
-            <label for="docs_logs">Document Logs:</label>
-            <input type="checkbox" id="docs_logs" name="docs_logs" {% if docs_logs %}checked{% endif %}>
-            <br>
-
-            <label for="documents_dir">Documents Directory:</label>
-            <input type="text" id="documents_dir" name="documents_dir" value="{{ documents_dir }}" required>
-            <br>
-
-            <button type="submit">Update Settings</button>
-        </fieldset>
+        <input type="submit" value="Save Changes">
     </form>
 </body>
 </html>
