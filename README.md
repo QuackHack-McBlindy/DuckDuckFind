@@ -57,7 +57,7 @@ This will set up and run DuckDuckFind in the background, at http://localhost:511
    Go see settings.
 
   ```
-  http://localhost:5111/settings
+  http://localhost:5556/settings
   # default values
   # Search Depth: 40
   # Fallback to AI Chat: 1
@@ -73,7 +73,7 @@ This will set up and run DuckDuckFind in the background, at http://localhost:511
    *ducks should handle the rest.*
 
   ```
-  curl -X POST http://localhost:5111/ -H "Content-Type: application/json" -d '{"query": "User Qwack Here"}'
+  curl -X POST http://localhost:5556/ -H "Content-Type: application/json" -d '{"query": "User Qwack Here"}'
   ```
 
 ## **Contributing**
