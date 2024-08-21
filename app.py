@@ -1,3 +1,4 @@
+
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import sys
 import re
@@ -11,6 +12,9 @@ import logging
 import os
 
 app = Flask(__name__)
+
+
+import os
 
 # Define default values or retrieve from environment variables
 SEARCH_DEPTH = int(os.getenv("SEARCH_DEPTH", 40))
@@ -29,6 +33,7 @@ global_settings = {
     "DOCS_LOGS": DOCS_LOGS,
     "DOCUMENTS_DIR": DOCUMENTS_DIR
 }
+
 
 @app.route('/settings', methods=['GET'])
 def settings():
@@ -55,11 +60,14 @@ def update_settings():
     
     return redirect(url_for('settings'))
 
+
 # Global settings
 important_phrases = [
     'stänger', 'öppettider', 'när', 'tid', 'datum', 'match', 'klockan', 'pris',
     'väder', 'regn', 'idag', 'imorgon', 'björklöven', 'björklövens'
 ]
+
+
 
 stock_name_to_symbol = {
     "apple": "AAPL",
