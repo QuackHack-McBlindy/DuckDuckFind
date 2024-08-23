@@ -44,18 +44,16 @@ To get started with DuckDuckFind, follow these steps:
 
   ```
   docker compose up -d --build
-  # don't like containers? you can run script as is
-  # chmod +x ddf.py
-  # sudo mv ddf.py /usr/local/bin/ddf
-  # § ddf "document how does ducks sound?"
   ```
 
-This will set up and run DuckDuckFind in the background, at http://localhost:5111/ ready to handle your queries.
+This will set up and run DuckDuckFind in the background.<br>
+http://localhost:5111/ ready to handle your queries.
 
 ### **3. Settings:**
 
-   Go see settings at http://localhost:5556/settings <br>
-   To achieve the best results, you should fully control the scoring system by adjusting the settings.  <br>
+   http://localhost:5556/settings <br>
+   Go see settings. <br>
+   To achieve the best results, you should try to control the scoring system by adjusting the settings.  <br>
    Specifically:
 
     1. Add words to the Important Phrases list.
@@ -63,7 +61,7 @@ This will set up and run DuckDuckFind in the background, at http://localhost:511
 
 For each word in your query that matches a word in the search result, the result earns +1 score. If the word also appears in the Important Phrases, it earns an additional +1 score.
 
-Understanding and controlling the score system can sometimes be crucial, and the difference between the best result and a *zero* result.<br>
+Understanding and controlling the score system as much as possible can sometimes be crucial, and the difference between the best result and a *zero* result.<br>
 
 
 ## **Example Usage**
@@ -75,23 +73,26 @@ Understanding and controlling the score system can sometimes be crucial, and the
   curl -X POST http://localhost:5556/ -H "Content-Type: application/json" -d '{"query": "User Qwack Here"}'
   ```
 
-## **Contributing**
+## **You don't like Docker..?**
 
-We welcome contributions from the community to help make DuckDuckFind even better!
+You can run the ddf as a CLI tool with Python. <br>
+1. Create and activate virtual enviorment. <br>
+2. Install requirments.txt <br>
+3. Make script execitable and add to PATH.
+   
+   ```bash
+   chmod +x ddf.py
+   sudo mv ddf.py /usr/local/bin/ddf
+   ´´´ 
+
+4. That's it. Test.       
 
 
-### **Suggestions and Feedback**
-
-If you have suggestions or encounter any issues, please open an issue on GitHub. Include as much detail as possible, such as the language, region, or specific scenario where you encountered the issue.
-
-### **Contributing Documentation**
-
-If you're interested in improving the project's documentation, we welcome contributions to the README, code comments, or other project docs.
+   ```
+   § dff <query>
+   ```
 
 
-## **Limitations and Disclaimers**
-
-- **Use of yfinance:** DuckDuckFind utilizes the yfinance library to retrieve stock prices. Please ensure you read and agree to the Yahoo Finance Terms of Service before using this feature.
 
 🎈 **Thank You** 🎈
 
