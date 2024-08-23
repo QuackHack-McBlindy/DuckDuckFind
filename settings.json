@@ -1,0 +1,51 @@
+{
+    "SEARCH_DEPTH": 40,
+    "FALLBACK_TO_AI_CHAT": true,
+    "LOOP_UNTIL_SUCCESS": true,
+    "DOCUMENTS_DIR": "/app/Documents",
+    "MIN_SCORE_THRESHOLD": 8,
+    "important_phrases": [
+        "st\u00e4nger",
+        "\u00f6ppettider",
+        "n\u00e4r",
+        "tid",
+        "datum",
+        "match",
+        "tv",
+        "pris",
+        "v\u00e4der",
+        "regn",
+        "idag",
+        "imorgon",
+        "bj\u00f6rkl\u00f6ven",
+        "bj\u00f6rkl\u00f6vens",
+        "kanal 6",
+        "kanal 3",
+        "kanal 5",
+        "p\u00e5",
+        "IF"
+    ],
+    "document_terms": {
+        "english": "document",
+        "swedish": "dokument"
+    },
+    "stock_terms": {
+        "english": "stock",
+        "swedish": "aktie"
+    },
+    "stock_name_to_symbol": {
+        "\"apple\"": " \"AAPL\",",
+        "\"volvo\"": " \"VOLV-B.ST\",",
+        "\"volkswagen\"": " \"VOW3.DE\",",
+        "\"equinor\"": " \"EQNR.OL\",",
+        "\"asml\"": " \"ASML.AS\","
+    },
+    "language_to_country_code": {
+        "sv": "\".ST\"                    ",
+        "en": "\"\""
+    },
+    "language_to_output_format": {},
+    "PUBLIC_TRANSPORT_ENABLED": false,
+    "TRANSPORT_API_KEY": "xxxx",
+    "DOCS_LOGS": false
+}
