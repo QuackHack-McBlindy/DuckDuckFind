@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   duckduckfind:
     build: .
@@ -9,4 +7,5 @@ services:
       FLASK_ENV: development
     volumes:
       - ./documents:/app/Documents
-    user: "1000:1000"  # Ensure container runs with a specific user to avoid permission issues
+    user: "1000:1000"  # Might be needed for writing settings.json
+    restart: "always"
