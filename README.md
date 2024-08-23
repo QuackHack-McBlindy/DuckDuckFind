@@ -35,7 +35,7 @@ To get started with DuckDuckFind, follow these steps:
 
   ```
   git clone https://github.com/QuackHack-McBlindy/duckduckfind.git
-  cd duckduckfind
+  cd DuckDuckFind
   ```
 
 ### **2. Build and Run the Project Using Docker:**
