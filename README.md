@@ -63,7 +63,7 @@ This will set up and run DuckDuckFind in the background, at http://localhost:511
 
 For each word in your query that matches a word in the search result, the result earns +1 score. If the word also appears in the Important Phrases, it earns an additional +1 score.
 
-Understanding and controlling the score system with these two knobs can sometimes be crucial, and the difference between the best result and a *zero* result.<br>
+Understanding and controlling the score system can sometimes be crucial, and the difference between the best result and a *zero* result.<br>
 
 
 ## **Example Usage**
