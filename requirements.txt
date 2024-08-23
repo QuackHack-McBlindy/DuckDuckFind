@@ -6,3 +6,4 @@ yfinance
 langdetect
 langcodes[full]
 gunicorn
+python-dotenv
