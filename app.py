@@ -6,120 +6,135 @@ from bs4 import BeautifulSoup
 from duckduckgo_search import DDGS
 import logging
 import yfinance as yf
+import json
 from langdetect import detect, LangDetectException
 from langcodes import Language
-import argparse
+from datetime import datetime, timezone, timedelta
 import os
-
 app = Flask(__name__)
 
-# Initial settings
-settings = {
-    "SEARCH_DEPTH": 40,
-    "FALLBACK_TO_AI_CHAT": True,
-    "LOOP_UNTIL_SUCCESS": False,
-    "DOCUMENTS_DIR": "/app/Documents",
-    "MIN_SCORE_THRESHOLD": 8,
-    "DOCS_LOGS": True,
-    "important_phrases": [
-        'stänger', 'öppettider', 'när', 'tid', 'datum', 'match', 'klockan', 'pris', 
-        'väder', 'regn', 'idag', 'imorgon', 'björklöven', 'björklövens'
-    ],
-    "stock_name_to_symbol": {
-        "apple": "AAPL",
-        "volvo": "VOLV-B.ST",
-        "volkswagen": "VOW3.DE",
-        "l'oréal": "OR.PA",
-        "equinor": "EQNR.OL",
-        "asml": "ASML.AS",
-    },
-    "document_terms": {
-        "english": "document",
-        "swedish": "dokument",
-        "german": "dokument",
-        "french": "document",
-        "spanish": "documento",
-        "italian": "documento",
-        "norwegian": "dokument",
-        "dutch": "document",
-    },
-    "stock_terms": {
-        "english": "stock",
-        "swedish": "aktie",
-        "german": "aktie",
-        "french": "action",
-        "spanish": "acción",
-        "italian": "azione",
-        "norwegian": "aksje",
-        "dutch": "aandeel",
-    },
-    "language_to_country_code": {
-        "swedish": ".ST",
-        "english": "",
-        "german": ".DE",
-        "french": ".PA",
-        "spanish": ".MC",
-        "italian": ".MI",
-        "norwegian": ".OL",
-        "dutch": ".AS",
-    },
-    "language_to_output_format": {
-        "swedish_kr": "Priset på en {symbol} aktie är: {price:.2f} kr",
-        "swedish_dollar": "Priset på en {symbol} aktie är: {price:.2f} dollar",
-        "english": "The current price of a {symbol} stock is ${price:.2f}.",
-        "german": "Der aktuelle Preis einer {symbol} Aktie beträgt {price:.2f} €.",
-        "french": "Le prix actuel d'une action {symbol} est de {price:.2f} €.",
-        "spanish": "El precio actual de una acción de {symbol} es {price:.2f} €.",
-        "italian": "Il prezzo attuale di un'azione {symbol} è {price:.2f} €.",
-        "norwegian": "Prisen på en {symbol} aksje er {price:.2f} kr.",
-        "dutch": "De huidige prijs van een {symbol} aandeel is {price:.2f} €.",
-    }
-}
+def load_settings():
+    with open('settings.json', 'r') as f:
+        return json.load(f)
 
-# Update global settings
+settings = load_settings()
+timezone_offset = settings.get("TIMEZONE_OFFSET", 2)  # Default to GMT+0 if not specified
+GMT_PLUS_2 = timezone(timedelta(hours=timezone_offset))
+
 def update_global_settings():
-    global SEARCH_DEPTH, FALLBACK_TO_AI_CHAT, LOOP_UNTIL_SUCCESS, DOCUMENTS_DIR, MIN_SCORE_THRESHOLD, DOCS_LOGS, important_phrases, stock_name_to_symbol, document_terms, stock_terms, language_to_country_code, language_to_output_format
-    SEARCH_DEPTH = settings["SEARCH_DEPTH"]
-    FALLBACK_TO_AI_CHAT = settings["FALLBACK_TO_AI_CHAT"]
-    LOOP_UNTIL_SUCCESS = settings["LOOP_UNTIL_SUCCESS"]
-    DOCUMENTS_DIR = settings["DOCUMENTS_DIR"]
-    MIN_SCORE_THRESHOLD = settings["MIN_SCORE_THRESHOLD"]
-    DOCS_LOGS = settings["DOCS_LOGS"]
-    important_phrases = settings["important_phrases"]
-    stock_name_to_symbol = settings["stock_name_to_symbol"]
-    document_terms = settings["document_terms"]
-    stock_terms = settings["stock_terms"]
-    language_to_country_code = settings["language_to_country_code"]
-    language_to_output_format = settings["language_to_output_format"]
+    global SEARCH_DEPTH, FALLBACK_TO_AI_CHAT, LOOP_UNTIL_SUCCESS, DOCUMENTS_DIR, MIN_SCORE_THRESHOLD, DOCS_LOGS, important_phrases, stock_name_to_symbol, document_terms, stock_terms, language_to_country_code, language_to_output_format, transport_triggers, API_KEY
+
+    SEARCH_DEPTH = settings.get("SEARCH_DEPTH", 40)
+    FALLBACK_TO_AI_CHAT = settings.get("FALLBACK_TO_AI_CHAT", True)
+    LOOP_UNTIL_SUCCESS = settings.get("LOOP_UNTIL_SUCCESS", False)
+    DOCUMENTS_DIR = settings.get("DOCUMENTS_DIR", "/app/Documents")
+    MIN_SCORE_THRESHOLD = settings.get("MIN_SCORE_THRESHOLD", 8)
+    DOCS_LOGS = settings.get("DOCS_LOGS", True)
+    important_phrases = settings.get("important_phrases", [])
+    stock_name_to_symbol = settings.get("stock_name_to_symbol", {})
+    document_terms = settings.get("document_terms", {})
+    stock_terms = settings.get("stock_terms", {})
+    language_to_country_code = settings.get("language_to_country_code", {})
+    language_to_output_format = settings.get("language_to_output_format", {})
+    transport_triggers = settings.get("transport_triggers", ['buss', 'tåg', 'flyg', 'station', 'resa', 'avfärd', 'ankomst', 'rutt', 'tidtabell'])
+    API_KEY = settings.get("TRANSPORT_API_KEY", "YOUR_API_KEY_HERE")
 
 update_global_settings()
 
+# Logging setup based on settings
 logging.basicConfig(level=logging.INFO)
 docs_logger = logging.getLogger('docs_logs')
 docs_logger.setLevel(logging.INFO)
 docs_log_handler = logging.StreamHandler()
 docs_logger.addHandler(docs_log_handler)
 
-@app.route('/settings', methods=['GET', 'POST'])
-def settings_page():
-    if request.method == 'POST':
-        # Handle form submission
-        for key in settings.keys():
-            if key in request.form:
-                if key == "important_phrases":
-                    settings[key] = request.form.getlist(key)
-                elif isinstance(settings[key], bool):
-                    settings[key] = request.form.get(key) == 'on'
-                elif isinstance(settings[key], int):
-                    settings[key] = int(request.form[key])
-                elif isinstance(settings[key], str):
-                    settings[key] = request.form[key]
-        # Update global variables
-        update_global_settings()
-        return redirect(url_for('settings_page'))
+def parse_query(query):
+    query = query.lower().strip()
+    from_pattern = re.compile(r'från\s+([\w\s]+)\s+till\s+([\w\s]+)')
+    to_pattern = re.compile(r'till\s+([\w\s]+)\s+från\s+([\w\s]+)')
 
-    return render_template('settings.html', settings=settings)
+    match_from_to = from_pattern.search(query)
+    match_to_from = to_pattern.search(query)
 
+    if match_from_to:
+        origin = match_from_to.group(1).strip()
+        destination = match_from_to.group(2).strip()
+    elif match_to_from:
+        destination = match_to_from.group(1).strip()
+        origin = match_to_from.group(2).strip()
+    else:
+        raise ValueError("Kunde inte tolka frågan. Använd formatet 'När går bussen från [Start] till [Slut]?' eller 'När går bussen till [Slut] från [Start]?'")
+    
+    return origin, destination
+
+def get_stop_id(stop_name):
+    url = f"https://api.resrobot.se/v2.1/location.name?input={stop_name}&format=json&accessId={API_KEY}"
+    response = requests.get(url)
+    
+    if response.status_code != 200:
+        return f"Fel: Mottog statuskod {response.status_code} från API."
+    
+    try:
+        data = response.json()
+    except ValueError:
+        return "Fel: Kunde inte tolka JSON-svaret."
+    
+    stop_locations = [item['StopLocation'] for item in data['stopLocationOrCoordLocation'] if 'StopLocation' in item]
+    
+    if len(stop_locations) == 0:
+        return f"Fel: Inga hållplatser hittades för {stop_name}."
+    
+    stop_id = stop_locations[0]['extId']
+    return stop_id
+
+def get_next_route(origin_id, dest_id):
+    url = f"https://api.resrobot.se/v2.1/trip?format=json&originId={origin_id}&destId={dest_id}&passlist=0&showPassingPoints=0&numF=3&accessId={API_KEY}"
+    response = requests.get(url)
+    
+    if response.status_code == 400:
+        return "Fel: Dålig förfrågan - Detta kan bero på en ogiltig kombination av hållplatser eller en inkompatibel rutt."
+    elif response.status_code != 200:
+        return f"Fel: Mottog statuskod {response.status_code} från API."
+    
+    try:
+        data = response.json()
+    except ValueError:
+        return "Fel: Kunde inte tolka JSON-svaret."
+    
+    if 'Trip' not in data or len(data['Trip']) == 0:
+        return "Fel: Inga resor hittades."
+    
+    return data['Trip']
+
+def format_transport_response(trips):
+    now = datetime.now(GMT_PLUS_2)
+    formatted_response = f"Aktuell tid är {now.strftime('%H:%M')}.\n"
+    
+    for i, trip in enumerate(trips):
+        origin = trip['LegList']['Leg'][0]['Origin']
+        destination = trip['LegList']['Leg'][0]['Destination']
+        product = trip['LegList']['Leg'][0]['Product'][0]
+        
+        dep_time = datetime.strptime(f"{origin['date']} {origin['time']}", "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc).astimezone(GMT_PLUS_2)
+        arr_time = datetime.strptime(f"{destination['date']} {destination['time']}", "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc).astimezone(GMT_PLUS_2)
+        
+        minutes_to_departure = int((dep_time - now).total_seconds() / 60)
+        day = dep_time.strftime("%A")
+        bus_number = product['num']
+        
+        if i == 0:
+            formatted_response += (
+                f"Nästa resa från {origin['name']} till {destination['name']} med buss {bus_number} avgår om {minutes_to_departure} minuter "
+                f"({dep_time.strftime('%H:%M')}) på {day} och anländer kl. {arr_time.strftime('%H:%M')}."
+            )
+        else:
+            formatted_response += (
+                f" Nästa avgång efter det med buss {bus_number} är om {minutes_to_departure} minuter ({dep_time.strftime('%H:%M')})."
+            )
+
+    return formatted_response
+
+# Other functions
 def detect_language(text):
     try:
         language_code = detect(text)
@@ -219,114 +234,250 @@ def ai_chat(user_input):
             if page_source_answer:
                 return fallback_to_ai_chat(user_input, page_source_answer)
         attempt_count += 1
-        if not LOOP_UNTIL_SUCCESS:
-            break
-    if FALLBACK_TO_AI_CHAT:
-        return fallback_to_ai_chat(user_input)
-    else:
-        return "I searched the web but couldn't find a clear answer to your question."
+        results = ddgs.text(query)
+    return fallback_to_ai_chat(user_input)
 
-def get_stock_price(query):
-    detected_language = detect_language(query)
-    country_code = language_to_country_code.get(detected_language, "")
-    for name, symbol in stock_name_to_symbol.items():
-        if name.lower() in query.lower():
-            try:
-                return fetch_stock_data(symbol)
-            except Exception as e:
-                return {"error": str(e)}
-    ddg = DDGS()
-    results = ddg.chat(query + " stock symbol")
-    if not results:
-        return {"error": "No results found"}
-    match = re.search(r'\b[A-Z0-9]{2,5}(?:-[A-Z])?\b', results)
-    if match:
-        symbol = match.group(0)
-        try:
-            if country_code and not symbol.endswith(country_code):
-                symbol += country_code
-            return fetch_stock_data(symbol)
-        except Exception as e:
-            return {"error": str(e)}
-    return {"error": "Stock symbol not recognized"}
-
-def fetch_stock_data(symbol):
-    stock = yf.Ticker(symbol)
-    history_data = stock.history(period='1mo')
-    if not history_data.empty:
-        price = history_data['Close'].iloc[-1]
+def get_stock_price(stock_name):
+    symbol = stock_name_to_symbol.get(stock_name.lower())
+    if not symbol:
+        return {"error": "Stock symbol not found for the given stock name."}
+    try:
+        stock_info = yf.Ticker(symbol).info
+        price = stock_info.get('regularMarketPrice')
         return {"symbol": symbol, "price": price}
-    return {"error": f"No price data found for {symbol}. This stock may be delisted or not available."}
+    except Exception as e:
+        logging.error(f"Error fetching stock price: {e}")
+        return {"error": str(e)}
 
 def format_output(symbol, price, language):
-    if language == "swedish":
-        output_format = language_to_output_format["swedish_kr"] if symbol.endswith(".ST") else language_to_output_format["swedish_dollar"]
-    else:
-        output_format = language_to_output_format.get(language, language_to_output_format["english"])
-    return output_format.format(symbol=symbol, price=price)
+    if price is None:
+        return "Price information not available."
+    format_string = language_to_output_format.get(language, language_to_output_format["english"])
+    return format_string.format(symbol=symbol, price=price)
 
-def load_documents(doc_dir):
-    documents = {}
-    for root, _, files in os.walk(doc_dir):
-        for file in files:
-            if file.endswith(".txt"):
-                path = os.path.join(root, file)
-                with open(path, 'r', encoding='utf-8') as file_obj:
-                    documents[path] = file_obj.read()
-    return documents
+def get_time():
+    now = datetime.now()
+    return now.strftime('%H:%M')
 
-def search_documents(queries, documents):
-    results = []
-    for query in queries:
-        query = query.lower()
-        for path, text in documents.items():
-            if DOCS_LOGS:
-                docs_logger.info(f"Searching in file: {path}, with query: '{query}'")
-            if query in text.lower():
-                start = text.lower().index(query)
-                snippet = text[max(0, start - 50):start + 500]
-                results.append((path, snippet, query))
-    return results
+def get_current_tv_shows():
+    tv_listing_url = "https://tv.nu/"  # Example URL
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+    
+    try:
+        response = requests.get(tv_listing_url, headers=headers)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        show_elements = soup.find_all('div', class_='current-show')  # Example class name
+        shows = []
+        
+        for show in show_elements:
+            time = show.find('span', class_='time').text.strip()  # Adjust the class names as needed
+            title = show.find('span', class_='title').text.strip()
+            shows.append((time, title))
+        
+        return shows
 
-def format_path(path):
-    parts = path.split('/')
-    if len(parts) > 1:
-        return f"/{parts[-2]}  / {parts[-1]}"
-    return path
+    except requests.RequestException as e:
+        logging.error(f"Error fetching TV listings: {e}")
+        return []
 
-def document_search(query):
-    language = detect_language(query)
-    cleaned_query = clean_query(query, language)
-    cleaned_query = cleaned_query.lower()
-    if DOCS_LOGS:
-        docs_logger.info(f"Starting document search in directory: {DOCUMENTS_DIR}")
-    documents = load_documents(DOCUMENTS_DIR)
-    results = search_documents([cleaned_query], documents)
-    if results:
-        for path, snippet, _ in results:
-            formatted_path = format_path(path)
-            return f"Your search for '{cleaned_query}' was found in: {formatted_path}\n{snippet}\n"
-    else:
-        return "No results found."
+def get_time():
+    now = datetime.now(GMT_PLUS_2)
+    return now.strftime('%H:%M')
 
+# Web scraping functions
+def scrape_website(url, query):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # Example: Extracting text from <div> tags
+        text = soup.get_text()
+        return text[:2000]  # Limit to first 2000 characters for brevity
+    except requests.RequestException as e:
+        logging.error(f"Error scraping website: {e}")
+        return None
+
+
+def analyze_text(text, query):
+    text = text.lower()
+    query = query.lower()
+    return query in text
+
+
+def find_tv_schedule(query):
+    search_engine = DDGS()
+    search_results = search_engine.text(query)
+    
+    for result in search_results:
+        url = result['href']
+        page_text = scrape_website(url, query)
+        if page_text and analyze_text(page_text, query):
+            return page_text  # Return the first match for simplicity
+    
+    return None
+
+def get_current_tv_shows():
+    # Define a time range to check for current shows
+    now = datetime.now(GMT_PLUS_2)
+    current_time = now.strftime('%H:%M')
+    
+    # Example query to find current TV shows
+    query = f"site:tv.nu vad spelas just nu på tv?"
+    tv_data = find_tv_schedule(query)
+    
+    if not tv_data:
+        return "No relevant TV schedule found."
+    
+    # Extract and format TV shows from the scraped data
+    shows = []
+    for line in tv_data.split('\n'):
+        if current_time in line:  # Check if the current time is mentioned in the schedule
+            shows.append(line)
+    
+    if not shows:
+        shows.append("No shows starting at the exact current time, but here's the current schedule:")
+    
+    # Format response
+    response = f"Current TV shows around {current_time}:\n"
+    for show in shows:
+        response += f"{show}\n"
+    
+    return response
+
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings_page():
+    if request.method == 'POST':
+        try:
+            # Collect updated settings from the form submission
+            new_settings = {
+                "SEARCH_DEPTH": int(request.form['SEARCH_DEPTH']),
+                "FALLBACK_TO_AI_CHAT": 'FALLBACK_TO_AI_CHAT' in request.form,
+                "LOOP_UNTIL_SUCCESS": 'LOOP_UNTIL_SUCCESS' in request.form,
+                "DOCUMENTS_DIR": request.form['DOCUMENTS_DIR'],
+                "MIN_SCORE_THRESHOLD": int(request.form['MIN_SCORE_THRESHOLD']),
+                "important_phrases": [phrase.strip() for phrase in request.form['important_phrases'].split(',')],
+                "document_terms": dict(item.split(':') for item in request.form['document_terms'].strip().splitlines() if ':' in item),
+                "stock_terms": dict(item.split(':') for item in request.form['stock_terms'].strip().splitlines() if ':' in item),
+                "stock_name_to_symbol": dict(item.split(':') for item in request.form['stock_name_to_symbol'].strip().splitlines() if ':' in item),
+                "language_to_country_code": dict(item.split(':') for item in request.form['language_to_country_code'].strip().splitlines() if ':' in item),
+                "language_to_output_format": dict(item.split(':') for item in request.form['language_to_output_format'].strip().splitlines() if ':' in item),
+                "PUBLIC_TRANSPORT_ENABLED": 'PUBLIC_TRANSPORT_ENABLED' in request.form,
+                "TRANSPORT_API_KEY": request.form['TRANSPORT_API_KEY'],
+                "DOCS_LOGS": 'DOCS_LOGS' in request.form
+            }
+
+            # Write the updated settings to the JSON file
+            with open('settings.json', 'w') as f:
+                json.dump(new_settings, f, indent=4)
+                print("Settings saved to settings.json:", new_settings)  # Debug statement
+
+            global settings
+            settings = load_settings()  # Reload settings from the file
+            update_global_settings()
+
+            return redirect(url_for('settings_page'))
+
+        except Exception as e:
+            print("Error saving settings:", str(e))  # debug
+            return render_template('settings.html', settings=settings, error=str(e))
+
+    
+    print("Loading settings for display:", settings)  # Debug statement
+    return render_template('settings.html', settings=settings, api_key_placeholder="******")
+
+
+@app.route('/reset_settings', methods=['POST'])
+def reset_settings():
+    try:
+        default_settings = {
+            "SEARCH_DEPTH": 40,
+            "FALLBACK_TO_AI_CHAT": True,
+            "LOOP_UNTIL_SUCCESS": False,
+            "DOCUMENTS_DIR": "/app/Documents",
+            "MIN_SCORE_THRESHOLD": 8,
+            "important_phrases": [],
+            "document_terms": {},
+            "stock_terms": {},
+            "stock_name_to_symbol": {},
+            "language_to_country_code": {},
+            "language_to_output_format": {},
+            "PUBLIC_TRANSPORT_ENABLED": False,
+            "TRANSPORT_API_KEY": "YOUR_API_KEY_HERE",
+            "DOCS_LOGS": True
+        }
+
+        # Write the default settings to the JSON file
+        with open('settings.json', 'w') as f:
+            json.dump(default_settings, f, indent=4)
+            print("Default settings written to settings.json")  # Debug statement
+
+        # Update global settings in the application
+        global settings
+        settings = load_settings()  # Reload settings from the file
+        update_global_settings()
+
+        return redirect(url_for('settings_page'))
+
+    except Exception as e:
+        print("Error resetting settings:", str(e))  # Debug statement
+        return redirect(url_for('settings_page', error=str(e)))
+
+
+
+# Route to handle requests
 @app.route('/', methods=['POST'])
 def handle_request():
     data = request.json
     query = data.get('query', '')
     
-    if check_for_document_related_terms(query):
+    if any(trigger in query.lower() for trigger in transport_triggers):
+        try:
+            origin_stop, dest_stop = parse_query(query)
+            origin_id = get_stop_id(origin_stop)
+            dest_id = get_stop_id(dest_stop)
+            
+            if isinstance(origin_id, str) and "Fel" in origin_id:
+                response = origin_id
+            elif isinstance(dest_id, str) and "Fel" in dest_id:
+                response = dest_id
+            else:
+                trips = get_next_route(origin_id, dest_id)
+                if isinstance(trips, str) and "Fel" in trips:
+                    response = trips
+                else:
+                    response = format_transport_response(trips)
+        except ValueError as e:
+            response = str(e)
+
+    elif "tv" in query.lower() and "just nu" in query.lower():
+        current_time = get_time()
+        shows = get_current_tv_shows()
+        response = f"Current TV shows at {current_time}:\n"
+        for show in shows.split('\n'):
+            response += f"{show}\n"
+    
+    elif check_for_document_related_terms(query):
         response = document_search(query)
+    
     elif check_for_stock_related_terms(query):
-        result = get_stock_price(query)
+        result = find_stock_info(query)
         if "error" in result:
             response = f"Error: {result['error']}"
         else:
             detected_language = detect_language(query)
             response = format_output(result["symbol"], result["price"], detected_language)
+    
     else:
         response = ai_chat(query)
     
     return Response(response, mimetype='text/plain')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5556)
