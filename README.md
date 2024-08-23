@@ -22,8 +22,8 @@ Originally designed for use with voice assistants, DuckDuckFind can be utilized 
 - **Stock Price Retrieval:** Instantly retrieve todays stock prices across multiple regions, tailored to your language and location.
 - **Smart Web Search with AI:** DuckDuckFind uses DuckDuckGo for web searches, scrapes relevant page content, and employs AI to validate and refine the results.
 - **Language Detection and Contextual Understanding:** Automatically detects the language of your queries, providing accurate and culturally relevant responses.
-- **Multi-Domain Query Handling:** From sports schedules to store hours, DuckDuckFind can handle a wide range of queries, offering deep insights and detailed answers.
-- **Higly Configurable:** Customize search depth, logging, document directories, and by controlling the score system - you can fine tune to your specific needs. 
+- **Multi-Domain Query Handling:** From sports schedules to store hours and all kinds of departure times, DuckDuckFind can handle a wide range of queries, offering deep insights and detailed answers.
+- **Higly Configurable:** Customize all kinds of options from the web UI, logging, document directories, and by controlling the score system - you can fine tune to your specific needs. 
 
 ## **Getting Started**
 
@@ -63,14 +63,7 @@ This will set up and run DuckDuckFind in the background, at http://localhost:511
 
 For each word in your query that matches a word in the search result, the result earns +1 score. If the word also appears in the Important Phrases, it earns an additional +1 score.
 
-  ```
-  default values
-  Search Depth: 40
-  Fallback to AI Chat: 1
-  Loop Until Success: 0
-  Minimal Score Threshold: 8
-  ```
-
+Understanding and controlling the score system with these two knobs can sometimes be crucial, and the difference between the best result and a *zero* result.<br>
 
 
 ## **Example Usage**
