@@ -2,9 +2,16 @@
 
 ![DuckDuckFind Logo](https://raw.githubusercontent.com/QuackHack-McBlindy/DuckDuckFind/main/duckduckfind.png)
 
+**⚠️ WARNING ⚠️** <BR>
+*PROJECT IS IN ACTIVE DEVELOPMENT*  
+*BE AWARE OF POSSIBLE BREAKING CHANGES OR BUGS*  
+
+<BR>
+
 Welcome to **DuckDuckFind**— a cutting-edge tool that revolutionizes how you search for information across the web and your local files. DuckDuckFind harnesses the power of the DuckDuckGo search engine, intelligent language detection, and advanced web scraping techniques to extract and verify data. Qwack?! —DuckDuckFind also leverages AI to process and refine the information it gathers, ensuring you receive accurate and relevant results every time.
 
 Originally designed for use with voice assistants, DuckDuckFind can be utilized in various other ways. It’s built to handle a wide range of queries, from retrieving stock prices and searching through local documents to pulling relevant information from web pages. Whether you’re checking the next game of your favorite sports team or looking up the opening hours of a local store, DuckDuckFind works to gather and refine this information, providing you with clear and concise answers. It’s a versatile tool that brings advanced search capabilities to your fingertips.
+
 
 ## **Table of Contents**
 
@@ -24,6 +31,9 @@ Originally designed for use with voice assistants, DuckDuckFind can be utilized 
 - **Language Detection and Contextual Understanding:** Automatically detects the language of your queries, providing accurate and culturally relevant responses.
 - **Multi-Domain Query Handling:** From sports schedules to store hours and all kinds of departure times, DuckDuckFind can handle a wide range of queries, offering deep insights and detailed answers.
 - **Higly Configurable:** Customize all kinds of options from the web UI, logging, document directories, and by controlling the score system - you can fine tune to your specific needs. 
+- **Custom Scraping:** Perform configurable web scraping from within the web UI,features include file format output, scheduling annd creation of an EPG service and full management of it. 
+- **Display:** A endpont designed specifically for displaying results when searcing for personal images or 
+if you prefer, you can output graphs from stock queries.  
 
 ## **Getting Started**
 
