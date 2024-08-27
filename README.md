@@ -34,7 +34,7 @@ Originally designed for use with voice assistants, DuckDuckFind can be utilized 
 - **Custom Scraping:** Perform configurable web scraping from within the web UI,features include file format output, scheduling annd creation of an EPG service and full management of it. 
 - **Display:** A endpont designed specifically for displaying results when searcing for personal images or 
 if you prefer, you can output graphs from stock queries.  
-- **Link & Conenct Services:** Connect other services or intentsm define and configure trigger words for them and safely store their API tokens from within the web UI - following security best practice.   
+- **Link & Conenct Services:** Connect other services or intents. Define and configure trigger words for services, and safely store their API tokens from within the web UI - following security best practice.   
 
 ## **Getting Started**
 
