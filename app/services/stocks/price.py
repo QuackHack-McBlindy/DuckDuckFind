@@ -1,16 +1,19 @@
 # /app/services/stocks/price.py
+import yfinance as yf
 import re
 import argparse
 import ast
+import os
+import requests_cache
+import matplotlib.pyplot as plt
 from settings import get_setting, get_dict_setting
 from rapidfuzz import process, fuzz
 from pytickersymbols import PyTickerSymbols
 from itertools import combinations
 from duckduckgo_search import DDGS
-import yfinance as yf
+from datetime import datetime, timedelta
 from langdetect import detect, LangDetectException
 from langcodes import Language
-import requests_cache
 from requests import Session
 from requests_cache import CacheMixin, SQLiteCache
 from requests_ratelimiter import LimiterMixin, MemoryQueueBucket
@@ -35,6 +38,69 @@ language_to_country_code = get_dict_setting("language_to_country_code")
 stock_name_to_symbol = get_dict_setting("stock_name_to_symbol")
 language_to_output_format = get_dict_setting("language_to_output_format")
 
+# TODO Output Settings
+# TODO More Languages
+# TODO Extend History Spread
+time_phrases = {
+    "english": {
+        "last (\d+) months?": lambda x: ("", datetime.now() - timedelta(days=int(x)*30), datetime.now()),
+        "last (\d+) weeks?": lambda x: ("", datetime.now() - timedelta(weeks=int(x)), datetime.now()),
+        "last (\d+) years?": lambda x: ("", datetime.now() - timedelta(days=int(x)*365), datetime.now()),
+        "last year": lambda x: ("1y", None, None),
+        "last (\d+) days?": lambda x: ("", datetime.now() - timedelta(days=int(x)), datetime.now()),
+        "last month": lambda x: ("1mo", None, None),
+        "last 6 months": lambda x: ("6mo", None, None)
+    },
+    "swedish": {
+        "senaste (\d+) månader?": lambda x: ("", datetime.now() - timedelta(days=int(x)*30), datetime.now()),
+        "senaste (\d+) veckor?": lambda x: ("", datetime.now() - timedelta(weeks=int(x)), datetime.now()),
+        "senaste (\d+) år?": lambda x: ("", datetime.now() - timedelta(days=int(x)*365), datetime.now()),
+        "senaste året": lambda x: ("1y", None, None),
+        "senaste (\d+) dagar?": lambda x: ("", datetime.now() - timedelta(days=int(x)), datetime.now()),
+        "senaste månaden": lambda x: ("1mo", None, None),
+        "senaste 6 månader": lambda x: ("6mo", None, None)
+    },
+    "spanish": {
+        "últimos (\d+) meses?": lambda x: ("", datetime.now() - timedelta(days=int(x)*30), datetime.now()),
+        "últimas (\d+) semanas?": lambda x: ("", datetime.now() - timedelta(weeks=int(x)), datetime.now()),
+        "últimos (\d+) años?": lambda x: ("", datetime.now() - timedelta(days=int(x)*365), datetime.now()),
+        "el último año": lambda x: ("1y", None, None),
+        "últimos (\d+) días?": lambda x: ("", datetime.now() - timedelta(days=int(x)), datetime.now()),
+        "el último mes": lambda x: ("1mo", None, None),
+        "últimos 6 meses": lambda x: ("6mo", None, None)
+    }
+}
+
+def generate_stock_graph(history_data, symbol, save_path="/app/app/Media/Photos"):
+    """
+    Generate and save a stock price graph based on the historical data.
+    :param history_data: Pandas DataFrame containing historical stock price data.
+    :param symbol: The stock symbol for labeling the graph.
+    :param save_path: The directory where the graph will be saved. Defaults to '/app/Media/Photos'.
+    """
+    if history_data.empty:
+        print(f"No historical data available for {symbol}")
+        return
+    os.makedirs(save_path, exist_ok=True)
+    
+    # Define the file name
+    filename = f"{symbol}_stock_price.png"
+    full_path = os.path.join(save_path, filename)
+    
+    plt.figure(figsize=(10, 6))
+    plt.plot(history_data.index, history_data['Close'], label=f"{symbol} Close Price")
+    plt.title(f"{symbol} Stock Price Over Time") # TODO Insert proper history label
+    plt.xlabel("Date")
+    plt.ylabel("Price (in USD)") # TODO Extend currencies
+    plt.grid(True)
+    plt.legend()
+    plt.xticks(rotation=45)  # Rotate the x-axis labels for better readability
+
+    plt.tight_layout() # TODO Layout setting
+    plt.savefig(filename, format='png')
+    print(f"Stock price graph saved to {filename}")    
+    plt.clf() # Clear the plot to free memory for subsequent plots
+    return filename  
 
 def detect_language(text):
     """Detect the language of the query."""
@@ -46,16 +112,46 @@ def detect_language(text):
         default_language = get_setting("DEFAULT_LANGUAGE")
         return default_language or "english" 
 
-def fetch_stock_data(symbol):
-    """Fetch stock data using yfinance."""
+def parse_time_period(query, detected_language):
+    """
+    Parse the time period from the query string based on the detected language.
+    :param query: Natural language query (e.g., "last 3 months", "last year")
+    :param detected_language: Detected language from the query
+    :return: A tuple (period, start, end) where one of them is set and others are None
+    """
+    now = datetime.now()
+    
+    # TODO Default Language setting
+    language_phrases = time_phrases.get(detected_language, time_phrases["english"])
+    
+    # Loop through the time patterns for the detected language
+    for pattern, handler in language_phrases.items():
+        match = re.search(pattern, query)
+        if match:
+            return handler(match.group(1) if match.groups() else None)
+    
+    # Default to 1 month if no pattern is matched
+    return ("1mo", None, None)
+
+
+def fetch_stock_data(symbol, period="1mo", start=None, end=None):
+    """Fetch stock data using yfinance with optional period or date range."""
     symbol = symbol.replace(" ", "-")
     stock = yf.Ticker(symbol, session=session)
-    history_data = stock.history(period='1mo')
+    
+    # Fetch data either based on period or start/end date range
+    if start and end:
+        history_data = stock.history(start=start, end=end)
+    else:
+        history_data = stock.history(period=period)
+    
     if not history_data.empty:
         price = history_data['Close'].iloc[-1]
-        return {"symbol": symbol, "price": price}
+        return {"symbol": symbol, "price": price, "history": history_data}
+    
     return {"error": f"No price data found for {symbol}. This stock may be delisted or not available."}
-
+    
+    
 def format_output(symbol, price, language):
     """Format the stock price output based on language."""
     if language == "swedish":
@@ -118,15 +214,24 @@ def get_stock_price(query):
     """Main function to get the stock price based on a query."""
     detected_language = detect_language(query)
     country_code = language_to_country_code.get(detected_language, "")
-
+    
+    # Parse time period based on the detected language
+    period, start, end = parse_time_period(query, detected_language)
+    
     # Check predefined symbols first
     for name, symbol in stock_name_to_symbol.items():
         if name.lower() in query.lower():
             try:
-                return fetch_stock_data(symbol)
+                result = fetch_stock_data(symbol, period=period, start=start, end=end)
+                if "error" not in result:
+                    # Generate the stock graph after fetching the stock data
+                    graph_path = generate_stock_graph(result['history'], symbol)
+                    result['graph_path'] = graph_path  
+                    return result
             except Exception as e:
                 return {"error": str(e)}
     
+    # Fallback to searching for the stock symbol and generating a graph
     all_stock_names = list_all_stocks()
     closest_match, score = find_closest_match(query, all_stock_names)
     if closest_match and score >= 80:
@@ -134,8 +239,13 @@ def get_stock_price(query):
         if symbol:
             if country_code and not symbol.endswith(country_code):
                 symbol += country_code
-            return fetch_stock_data(symbol)
-    
+            result = fetch_stock_data(symbol, period=period, start=start, end=end)
+            if "error" not in result:
+                graph_path = generate_stock_graph(result['history'], symbol)
+                result['graph_path'] = graph_path  
+            return result
+            
+    # Handle DuckDuckGo symbol search fallback
     ddg = DDGS()
     try:
         results = ddg.chat(query + " stock symbol")
@@ -144,11 +254,17 @@ def get_stock_price(query):
             symbol = match.group(0)
             if country_code and not symbol.endswith(country_code):
                 symbol += country_code
-            return fetch_stock_data(symbol)
+            result = fetch_stock_data(symbol, period=period, start=start, end=end)
+            if "error" not in result:
+                graph_path = generate_stock_graph(result['history'], symbol)
+                result['graph_path'] = graph_path  # Add the graph path to the result
+            return result
     except Exception as e:
-        print(f"Error fetching stock symbol from DuckDuckGo: {e}")
+        return {"error": f"Error fetching stock symbol from DuckDuckGo: {str(e)}"}
     
     return {"error": "Sorry, stock symbol not recognized"}
+
+
 
 def main():
     """Main entry point for the script."""
