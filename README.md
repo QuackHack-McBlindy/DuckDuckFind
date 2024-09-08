@@ -2,11 +2,7 @@
 
 ![DuckDuckFind Logo](https://raw.githubusercontent.com/QuackHack-McBlindy/DuckDuckFind/main/duckduckfind.png)
 
-**⚠️ WARNING ⚠️** <BR>
-*PROJECT IS IN ACTIVE DEVELOPMENT*  
-*BE AWARE OF POSSIBLE BREAKING CHANGES OR BUGS*  
 
-<BR>
 
 Welcome to **DuckDuckFind**— a cutting-edge tool that revolutionizes how you search for information across the web and your local files. DuckDuckFind harnesses the power of the DuckDuckGo search engine, intelligent language detection, and advanced web scraping techniques to extract and verify data. Qwack?! —DuckDuckFind also leverages AI to process and refine the information it gathers, ensuring you receive accurate and relevant results every time.
 
