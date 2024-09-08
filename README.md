@@ -34,7 +34,7 @@ Originally designed for use with voice assistants, DuckDuckFind can be utilized 
 - **Custom Scraping:** Perform configurable web scraping from within the web UI,features include file format output, scheduling annd creation of an EPG service and full management of it. 
 - **Display:** A endpont designed specifically for displaying results when searcing for personal images or 
 if you prefer, you can output graphs from stock queries.  
-- **Link & Conenct Services:** Connect other services or intents. Define and configure trigger words for services, and safely store their API tokens from within the web UI - following security best practice.   
+- **Link & Conenct Services:** Connect other services. Define and configure trigger words for services, and safely store their API tokens from within the web UI - following security best practice.   
 
 ## **Getting Started**
 
@@ -84,28 +84,14 @@ Understanding and controlling the score system as much as possible can sometimes
   curl -X POST http://localhost:5556/ -H "Content-Type: application/json" -d '{"query": "User Qwack Here"}'
   ```
 
-## **You don't like Docker..?**
+If you prefer browser for testing you can converse at  
+http://localhost:5556/chat
 
-You can run the ddf as a CLI tool with Python. <br>
-1. Create and activate virtual enviorment. <br>
-2. Install requirments.txt <br>
-3. Make script execitable and add to PATH.
-   
-   ```bash
-   chmod +x ddf.py
-   sudo mv ddf.py /usr/local/bin/ddf
-   ´´´ 
+## **The Viewer**
 
-4. That's it. Test.       
-
-
-   ```
-   § dff <query>
-   ```
-
-
-
-🎈 **Thank You** 🎈
+You can visit the Viewer at http://localhost:5556/viewer  
+You can query photos simply by asking to display photos from specific year and they will be displayed in the /viewer.  
+As default, the viewer displays photos taken last year (365 days ago) as a slideshow.  
 
 
 ## **Questions?**
