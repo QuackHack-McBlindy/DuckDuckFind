@@ -16,3 +16,4 @@ pytickersymbols
 PyMuPDF
 Pillow
 markdown2
+matplotlib
