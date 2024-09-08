@@ -13,6 +13,7 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 RUN mkdir -p /app/app/Media/Photos && \
+    chmod -R 777 /app/app/Media/Photos && \
     chown -R www-data:www-data /app/app/Media/Photos
 
 USER www-data
