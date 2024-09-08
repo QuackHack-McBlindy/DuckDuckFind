@@ -90,15 +90,16 @@ You can query photos simply by asking to display photos from specific year and t
 As default, the viewer displays photos taken last year (365 days ago) as a slideshow.  
 
 
-Example query:  
-__"How has the Nvidia stock performed the last 6 months?"__  
-Response:
-_The current stock price of NVDA is: $102.83_
+_Example query:_  
+__"How has the Nvidia stock performed the last 6 months?"__   
+_Response:_  
+__The current stock price of NVDA is: $102.83__  
 
-This query will create a graph of the last 6 months closing price  
+In addition to giving a response with the price,  
+the query will create a graph of the last 6 months closing price  
 for the Nvidia stock, and display it in the /Viewer.
 
-![Example Graph](https://raw.githubusercontent.com/QuackHack-McBlindy/DuckDuckFind/main/stock_example.png)
+<img src="https://raw.githubusercontent.com/QuackHack-McBlindy/DuckDuckFind/main/stock_example.png" alt="Example Graph" width="40%" />
 
 
 
