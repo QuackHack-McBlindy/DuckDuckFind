@@ -99,22 +99,18 @@ def web_search(query):
         return "No query provided"   
     result = search_web_for_answer(query)
     return result
-
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #──→ CHAT ←──
 @app.route('/chat', methods=['POST', 'GET'])
 def render_chat():
     return render_template('chat.html')
-
 @app.route('/send_message', methods=['POST'])
 def send_message():
     data = request.get_json()
     if not data or 'query' not in data:
         return Response("No query provided", mimetype='text/plain', status=400)
-
     return route_request()
-
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #──→ STOCK PRICE ←──
@@ -123,18 +119,23 @@ def handle_query():
     data = request.get_json()
     if not data or 'query' not in data:
         return Response("JSON payload with 'query' field is required", status=400, mimetype='text/plain')
-    query = data['query']
+
+    query = data['query'].replace("?", "").replace("!", "")
+    result = get_stock_price(query)
     
-    query = query.replace("?", "").replace("!", "")
-    
-    result = get_stock_price(query) 
     if "error" in result:
         return Response(result["error"], status=404, mimetype='text/plain')
+    graph_path = generate_stock_graph(result['history'], result['symbol'])
 
     detected_language = detect_language(query)
     formatted_output = format_output(result['symbol'], result['price'], detected_language)
-    return Response(formatted_output, mimetype='text/plain')
-
+    global selected_photos
+    selected_photos = [graph_path]    
+    return formatted_output
+#    return jsonify({
+#        "formatted_output": formatted_output,
+#        "graph_path": graph_path  # Optional: return the graph path if needed
+#    })
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 if ENABLE_VIEWER:
@@ -198,8 +199,7 @@ def find_photos_one_year_ago_route():
 #──→ SERVE PHOTO ←──
 @app.route('/photos/<filename>')
 def serve_photo(filename):
-    return send_from_directory('/app/app/Media/Photos', filename)
-    
+    return send_from_directory('/app/app/Media/Photos', filename)  
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #──→ SETTINGS ←──
@@ -245,7 +245,6 @@ def settings_search_page():
 
     form_html = generate_settings_form('search')
     return render_template('settings_search.html', form_html=form_html, settings=current_app.config['SETTINGS'])
-
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #──→ SETTINGS / SCRAPE ←──
@@ -264,7 +263,6 @@ def settings_scrape_page():
 
     form_html = generate_settings_form('scrape')
     return render_template('settings_scrape.html', form_html=form_html, settings=current_app.config['SETTINGS'])
-
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #──→ SETTINGS / SCORE ←──
@@ -302,7 +300,6 @@ def settings_media_page():
 
     form_html = generate_settings_form('media')
     return render_template('settings_media.html', form_html=form_html, settings=current_app.config['SETTINGS'])
-
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #──→ SETTINGS / VIEWER ←──
@@ -321,7 +318,6 @@ def settings_viewer_page():
 
     form_html = generate_settings_form('viewer')
     return render_template('settings_viewer.html', form_html=form_html, settings=current_app.config['SETTINGS'])
-
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #──→ SETTINGS / CONNECT ←──
@@ -340,7 +336,6 @@ def settings_connect_page():
 
     form_html = generate_settings_form('connect')
     return render_template('settings_connect.html', form_html=form_html, settings=current_app.config['SETTINGS'])
-
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #──→ SETTINGS / OUTPUT ←──
@@ -365,7 +360,6 @@ def settings_output_page():
 @app.route('/reset_settings', methods=['POST'])
 def reset_settings():
     return 'test', 200
-
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°°✶.•°•.•°•.•°•.✶°
 #──→ MISC ←──
