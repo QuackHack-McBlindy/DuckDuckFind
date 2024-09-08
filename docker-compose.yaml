@@ -1,11 +1,24 @@
+# /DuckDuckFind/docker-compose.yaml
 services:
   duckduckfind:
+    container_name: duckduckfind
     build: .
     ports:
-      - "5556:5556"
+      - "5556:5556" 
     environment:
-      FLASK_ENV: development
+      - FLASK_ENV=development  # Running in development mode
+      - FLASK_DEBUG=1  
     volumes:
-      - ./documents:/app/Documents
-    user: "1000:1000"  # Might be needed for writing settings.json
-    restart: "always"
+      - ./:/app
+      - ./app/settings:/app/app/settings
+      - ./app/Media/Photos:/app/app/Media/Photos
+      - ./app/Media/Documents:/app/app/Media/Documents
+  # Ensure container runs with a specific user to avoid permission issues  
+    user: "1000:100" # Still no write permissions? Try `chmod 644 <file_path>` 
+    restart: "unless-stopped"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5556/health"]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+      start_period: 20s
