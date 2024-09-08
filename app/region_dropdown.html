@@ -1,0 +1,9 @@
+<!-- region_dropdown.html -->
+<label for="region">Choose your region:</label>
+<select name="region" id="region">
+  {% for region in regions %}
+    <option value="{{ region }}" {% if region == current_region %} selected {% endif %}>
+        {{ region }}
+    </option>
+  {% endfor %}
+</select>

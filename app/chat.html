@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../static/css/style4.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦆🦆🔍 DuckDuckFind Chat</title>
+</head>
+<body>
+    <header>
+        
+        <div class="header-icons-git">
+            <a href="https://github.com/QuackHack-McBlindy" title="GitHub">
+                <img src="https://raw.githubusercontent.com/QuackHack-McBlindy/share/main/github_teal.png" alt="GitHub">
+            </a><br>
+            <a href="https://discordapp.com/users/675530282849533952" title="Discord">
+                <img src="https://raw.githubusercontent.com/QuackHack-McBlindy/share/main/discord_teal.png" alt="Discord">
+            </a>            
+            
+            
+            
+
+        </div>
+        <div class="header-icons">
+            <a href="https://github.com/QuackHack-McBlindy/duckduckfind/stargazers" target="_blank" title="Stargazers">
+                <img src="https://png.pngtree.com/png-clipart/20230101/original/pngtree-golden-star-icon-vector-clipart-png-image_8843722.png" alt="Stargazers Icon">
+            </a>
+        </div>
+
+        <h1><span class="duck-emojii"> 🦆</span><span class="duck-emoji">🦆</span>🔍 <span class="neon-text">DuckDuckFind Chat</span>
+    </header><br><br><br><br><br><br><br>
+    
+    <div id="chat-container">
+        <div id="chat"></div> <!-- This is where chat bubbles will appear -->
+        <div id="input-container">
+            <input type="text" id="prompt" placeholder="Type your message..." onkeydown="checkEnter(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    
+
+    <script>
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const prompt = document.getElementById('prompt').value;
+            const chatContainer = document.getElementById('chat');
+
+            if (prompt.trim() === '') return; // Don't send empty messages
+
+            // Add the user's message to the chat
+            const userBubble = document.createElement('div');
+            userBubble.className = 'chat-bubble user-bubble';
+            userBubble.textContent = prompt;
+            chatContainer.appendChild(userBubble);
+
+            // Prepare the data for the POST request
+            const data = {
+                query: prompt
+            };
+
+            try {
+                // Send the POST request to the Flask app (this mimics the curl request)
+                const response = await fetch('/send_message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.text(); // Fetch the response as plain text
+                console.log(result);  // Log the result for debugging
+
+                // Convert newlines to <br> to preserve formatting in the web UI
+                const formattedResult = result.replace(/\n/g, '<br>');
+
+                // Add the AI's response to the chat
+                const aiBubble = document.createElement('div');
+                aiBubble.className = 'chat-bubble ai-bubble';
+                aiBubble.innerHTML = formattedResult;  // Use innerHTML to render <br> tags
+                chatContainer.appendChild(aiBubble);
+
+                // Clear the input field
+                document.getElementById('prompt').value = '';
+
+                // Scroll to the bottom of the chat
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            } catch (error) {
+                console.error('Error during fetch:', error);
+            }
+        }
+    </script>
+</body>
+</html>
+

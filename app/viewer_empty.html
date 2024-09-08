@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../static/css/style4.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦆🦆🔍 DuckDuckFind Viewer</title>
+    <style>
+        body { text-align: center; }
+        img { max-width: 80%; height: auto; margin: 20px 0; }
+        .slideshow-container {
+            position: relative;
+            margin: auto;
+        }
+    </style>
+
+</head>
+<body>
+    <header>
+        
+        <div class="header-icons-git">
+            <a href="https://github.com/QuackHack-McBlindy" title="GitHub">
+                <img src="https://raw.githubusercontent.com/QuackHack-McBlindy/share/main/github_teal.png" alt="GitHub">
+            </a><br>
+            <a href="https://discordapp.com/users/675530282849533952" title="Discord">
+                <img src="https://raw.githubusercontent.com/QuackHack-McBlindy/share/main/discord_teal.png" alt="Discord">
+            </a>            
+            
+            
+            
+
+        </div>
+        <div class="header-icons">
+            <a href="https://github.com/QuackHack-McBlindy/duckduckfind/stargazers" target="_blank" title="Stargazers">
+                <img src="https://png.pngtree.com/png-clipart/20230101/original/pngtree-golden-star-icon-vector-clipart-png-image_8843722.png" alt="Stargazers Icon">
+            </a>
+        </div>
+
+        <h1><span class="duck-emojii"> 🦆</span><span class="duck-emoji">🦆</span>🔍 <span class="neon-text">DuckDuckFind Viewer</span>
+    </header>
+        </div>          
+    <div class="container">
+        
+
+            <br>
+            
+        </form>
+    </div>
+    <script>
+        let slideIndex = 0;
+        showSlides();
+
+        function showSlides() {
+            let slides = document.getElementsByClassName("mySlides");
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            slideIndex++;
+            if (slideIndex > slides.length) { slideIndex = 1 }
+            slides[slideIndex-1].style.display = "block";
+            setTimeout(showSlides, 2000); // Change image every 2 seconds
+        }
+    </script>
+</body>
+</html>

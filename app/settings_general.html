@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../static/css/style4.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦆🦆🔍 DuckDuckFind Settings</title>
+
+
+</head>
+<body>
+    <header>
+        
+        <div class="header-icons-git">
+            <a href="https://github.com/QuackHack-McBlindy" title="GitHub">
+                <img src="https://raw.githubusercontent.com/QuackHack-McBlindy/share/main/github_teal.png" alt="GitHub">
+            </a><br>
+            <a href="https://discordapp.com/users/675530282849533952" title="Discord">
+                <img src="https://raw.githubusercontent.com/QuackHack-McBlindy/share/main/discord_teal.png" alt="Discord">
+            </a>            
+            
+            
+            
+
+        </div>
+        <div class="header-icons">
+            <a href="https://github.com/QuackHack-McBlindy/duckduckfind/stargazers" target="_blank" title="Stargazers">
+                <img src="https://png.pngtree.com/png-clipart/20230101/original/pngtree-golden-star-icon-vector-clipart-png-image_8843722.png" alt="Stargazers Icon">
+            </a>
+        </div>
+
+        <h1><span class="duck-emojii"> 🦆</span><span class="duck-emoji">🦆</span>🔍 <span class="neon-text">DuckDuckFind Settings</span>
+    </header><br><br><br><br><br><br><br>
+        </div>          
+    <div class="container">
+        <div class="tabs">
+            <ul>
+                <li><a href="{{ url_for('settings_general_page') }}" class="active">General</a></li>
+                <li><a href="{{ url_for('settings_search_page') }}">Search</a></li>
+                <li><a href="#">Scrape</a></li>
+                <li><a href="{{ url_for('settings_score_page') }}">Score</a></li>
+                <li><a href="#">Media</a></li>
+                <li><a href="{{ url_for('settings_viewer_page') }}">Viewer</a></li>
+                <li><a href="{{ url_for('settings_connect_page') }}">Connect</a></li>
+                <li><a href="{{ url_for('settings_output_page') }}">Output & Logs</a></li>
+            </ul>
+        </div>
+            <h1>General Settings</h1>
+            <form method="POST">
+              {{ form_html|safe }}
+              <button type="submit" class="btn-save">💾 Save Settings</button>
+            </form>
+
+            <br>
+        <h2>Need Help?</h2>
+        <h4>🏆🏆 Example POST using cURL:</h4>
+        <pre><code>curl -X POST http://localhost:5556/ -H "Content-Type: application/json" -d '{"query": "Your Query Here Please"}'</code></pre>
+        <h4>🌈🍎 <a href="https://www.icloud.com/shortcuts/fe61c5a396dc43dfb603a50672f364a5">Siri Integration</a> ✨✨🎊</h4>
+        <h4>🎖️🎖️ <a href="#" id="ha-link">HA Assist Integration</a> ✨✨🎊</h4>
+        <h4><a href="https://github.com/QuackHack-McBlindy/duckduckfind/">Documentation</a></h4>
+    </div>
+
+    <!-- Popup structure -->
+    <div id="popup-overlay" class="popup-overlay"></div>
+    <div id="popup" class="popup">
+        {% raw %}
+        <pre><code>
+    shell_command:
+      duckduckfind: >
+        curl -X POST http://localhost:5556/ -H "Content-Type: application/json" -d '{"query": "{{ query }}"}'
+
+    intent_script:
+      duckduckfind:
+        action:
+          - service: shell_command.duckduckfind
+            data:
+              query: "{{ query }}"
+            response_variable: action_response
+          - stop: ""
+            response_variable: action_response
+        speech:
+          text: "{{ action_response['stdout'] }}"
+        </code></pre>
+        {% endraw %}
+        <button id="copy-button">Copy</button>
+        <button id="close-button">Close</button>
+    </div>
+
+    <script src="../static/js/script.js"></script>
+</body>
+</html>
+
