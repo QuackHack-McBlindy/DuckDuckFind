@@ -38,7 +38,7 @@ settings_general = {
     },
     "stock_triggers": {
         "title": 'Stock Triggers',
-        "value": "['aktie', 'price', 'quote']",
+        "value": "['stock', 'price', 'quote']",
         "description": 'List of keywords to trigger stock-related searches.'
     },
     "photos_triggers": {
