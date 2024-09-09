@@ -91,17 +91,17 @@ As default, the viewer displays photos taken last year (365 days ago) as a slide
 
 
 _Example query:_  
-__"How has the Nvidia stock performed the last 6 months?"__   
+__"How has the Nvidia stock performed the last year?"__   
 _Response:_  
-__The current stock price of NVDA is: $102.83__  
+__The current price of a NVDA stock is $106.47. It has increased 135.72% over the last year.__  
 
 In addition to giving a response with the price,  
-the query will create a graph of the last 6 months closing price  
+the query will create a custom graph of the last years closing prices  
 for the Nvidia stock, and display it in the /Viewer.
 
 <img src="https://raw.githubusercontent.com/QuackHack-McBlindy/DuckDuckFind/main/stock_example.png" alt="Example Graph" width="40%" />
 
-
+You can specify any stock and time period.
 
 ## **Questions?**
 
