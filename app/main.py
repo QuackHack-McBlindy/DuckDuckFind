@@ -126,9 +126,16 @@ def handle_query():
     if "error" in result:
         return Response(result["error"], status=404, mimetype='text/plain')
     graph_path = generate_stock_graph(result['history'], result['symbol'])
-
     detected_language = detect_language(query)
-    formatted_output = format_output(result['symbol'], result['price'], detected_language)
+#    formatted_output = format_output(result['symbol'], result['price'], detected_language)
+    formatted_output = format_output(
+        result['symbol'], 
+        result['price'], 
+        result['percentage_change'], 
+        result['period'],
+        detected_language
+    )
+
     global selected_photos
     selected_photos = [graph_path]    
     return formatted_output
