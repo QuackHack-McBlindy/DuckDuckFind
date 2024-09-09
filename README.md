@@ -1,4 +1,4 @@
-# ❤️🦆🔍 DuckDuckFind
+Priset på en NVDA aktie är: 102.83 dollar# ❤️🦆🔍 DuckDuckFind
 
 ![DuckDuckFind Logo](https://raw.githubusercontent.com/QuackHack-McBlindy/DuckDuckFind/main/duckduckfind.png)
 
@@ -26,9 +26,9 @@ Originally designed for use with voice assistants, DuckDuckFind can be utilized 
 - **Smart Web Search with AI:** DuckDuckFind uses DuckDuckGo for web searches, scrapes relevant page content, and employs AI to validate and refine the results.
 - **Language Detection and Contextual Understanding:** Automatically detects the language of your queries, providing accurate and culturally relevant responses.
 - **Multi-Domain Query Handling:** From sports schedules to store hours and all kinds of departure times, DuckDuckFind can handle a wide range of queries, offering deep insights and detailed answers.
-- **Higly Configurable:** Customize all kinds of options from the web UI, logging, document directories, and by controlling the score system - you can fine tune to your specific needs. 
-- **Custom Scraping:** Perform configurable web scraping from within the web UI,features include file format output, scheduling annd creation of an EPG service and full management of it. 
-- **Display:** A endpont designed specifically for displaying results when searcing for personal images or 
+- **Highly Configurable:** Customize all kinds of options from the web UI, logging, document directories, and by controlling the score system - you can fine tune to your specific needs. 
+- **Custom Scraping:** Perform configurable web scraping from within the web UI,features include file format output, scheduling and creation of an EPG service and full management of it. 
+- **Display:** An endpont designed specifically for displaying results when searching for personal images or 
 if you prefer, you can output graphs from stock queries.  
 - **Link & Conenct Services:** Connect other services. Define and configure trigger words for services, and safely store their API tokens from within the web UI - following security best practice.   
 
@@ -105,3 +105,22 @@ for the Nvidia stock, and display it in the /Viewer.
 
 ## **Questions?**
 
+
+## **Troubleshooting**
+
+If you are having issues, it is most likely due to file permissions.  
+The user running the container needs read/write permissions.  
+Some helpful notes that might help:   
+You can try to exec into the container as root and change the permissions.
+Example,
+
+   ```docker run -it --user root duckduckfind /bin/bash```
+   ```chmod -R 777 /app```
+
+
+## **Contributing**
+
+This project is multilingual, and contributions,  
+along with thorough testing, are crucial to ensure its functionality across all supported languages.  
+We welcome community input to improve and expand the project's capabilities,   
+making it more robust and accessible to users worldwide. Your participation is key to its success!
