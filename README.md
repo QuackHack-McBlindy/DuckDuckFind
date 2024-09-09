@@ -1,4 +1,4 @@
-Priset på en NVDA aktie är: 102.83 dollar# ❤️🦆🔍 DuckDuckFind
+# ❤️🦆🔍 DuckDuckFind
 
 ![DuckDuckFind Logo](https://raw.githubusercontent.com/QuackHack-McBlindy/DuckDuckFind/main/duckduckfind.png)
 
